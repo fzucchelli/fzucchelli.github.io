@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PromptVault</title>
+
+  <!-- === Tailwind CDN Setup START === -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configure Tailwind CDN with your theme and settings
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0F1117',      // Main background
+            secondary: '#131620',    // Slightly lighter bg, like page container bg in SVG
+            panel: '#1A1E2E',        // Card/Input backgrounds
+            surface: '#1F2437',      // Sidebar bg, Active card bg
+            accent: {
+              blue: '#6366F1',
+              teal: '#03A9F4',
+              success: '#4CAF50',
+              warn: '#FF9800',
+              danger: '#FF6B6B',
+            },
+            muted: '#8E94A8',       // Secondary text, icons
+            fg: '#E2E5EF',          // Primary foreground text
+            'fg-white': '#FFFFFF', // Explicit white for specific elements like headers/buttons
+          },
+          spacing: {
+            xs: '4px',
+            sm: '8px',
+            md: '16px',
+            lg: '24px',
+            xl: '32px',
+          },
+          borderRadius: {
+            sm: '4px',
+            md: '8px',
+            lg: '12px',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'], // Switched to Inter for cleaner look
+            mono: ['JetBrains Mono', 'monospace'] // For code editor look
+          },
+           animation: { // Simple fade-in for view changes
+                'fade-in': 'fadeIn 0.3s ease-out forwards',
+                'slide-in-right': 'slideInRight 0.3s ease-out forwards',
+                'slide-out-right': 'slideOutRight 0.3s ease-in forwards',
+                'pulse-badge': 'pulseBadge 1.5s ease-in-out infinite',
+                'spin': 'spin 1s linear infinite', // For save spinner
+           },
+           keyframes: {
+                fadeIn: { '0%': { opacity: 0, transform: 'translateY(5px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+                slideInRight: { '0%': { transform: 'translateX(100%)', opacity: 0 }, '100%': { transform: 'translateX(0)', opacity: 1 } },
+                slideOutRight: { '0%': { transform: 'translateX(0)', opacity: 1 }, '100%': { transform: 'translateX(100%)', opacity: 0 } },
+                pulseBadge: { '0%, 100%': { transform: 'scale(1)', opacity: 1 }, '50%': { transform: 'scale(1.1)', opacity: .7 } },
+                spin: { 'from': { transform: 'rotate(0deg)' }, 'to': { transform: 'rotate(360deg)' } },
+           }
+        },
+      },
+      plugins: [], // Keep empty for pure CDN usage without extra JS
+    }
+  </script>
+  <!-- Add Inter font -->
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+  <style type="text/tailwindcss">
+    @layer components {
+      /* Component shortcuts */
+      .btn {
+        @apply inline-flex items-center justify-center px-md py-sm rounded-md font-sans font-semibold transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary disabled:opacity-50 disabled:cursor-not-allowed;
+      }
+      .btn-primary {
+        @apply bg-accent-blue text-white hover:bg-opacity-90 focus:ring-accent-blue;
+      }
+      .btn-secondary {
+        @apply bg-panel text-fg hover:bg-surface focus:ring-accent-blue;
+      }
+      .btn-ghost {
+        @apply bg-transparent text-muted hover:text-fg hover:bg-panel focus:ring-accent-blue;
+      }
+      .btn-danger {
+        @apply bg-accent-danger text-white hover:bg-opacity-90 focus:ring-accent-danger;
+      }
+       /* Consistent smaller button */
+      .btn-sm {
+         @apply !px-sm !py-xs text-xs;
+      }
+
+      .card {
+        @apply bg-surface rounded-md p-md shadow-lg; /* Slightly more prominent shadow */
+      }
+
+      .input-base { /* Slightly enhanced focus */
+          @apply block w-full bg-panel border border-secondary rounded-md py-sm px-md text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue sm:text-sm transition-all duration-150 ease-in-out;
+      }
+      /* Style selects like inputs */
+       select.input-base {
+         @apply pr-lg; /* Space for dropdown arrow */
+         /* Consider custom arrow styling if needed */
+         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238E94A8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+         background-position: right 0.5rem center;
+         background-repeat: no-repeat;
+         background-size: 1.5em 1.5em;
+         appearance: none; /* Remove default arrow */
+       }
+
+      .tab {
+        @apply px-md py-sm rounded-full text-muted cursor-pointer transition-colors duration-150 ease-in-out hover:text-fg;
+      }
+      .tab-active {
+        @apply bg-accent-blue text-white font-semibold;
+      }
+
+      .sidebar {
+        @apply bg-surface w-64 flex flex-col p-md h-screen fixed top-0 left-0 z-40; /* Added z-index */
+      }
+
+      .sidebar-item {
+        @apply flex items-center gap-sm w-full px-sm py-sm rounded-md text-sm transition-colors duration-150 ease-in-out;
+      }
+      .sidebar-item-inactive {
+        @apply text-muted hover:text-fg hover:bg-panel;
+      }
+      .sidebar-item-active { /* Enhanced active state */
+        @apply bg-panel text-white font-semibold relative;
+      }
+      /* Animated accent bar for active item */
+      .sidebar-item-active::before {
+          content: '';
+          @apply absolute left-0 top-0 bottom-0 w-1 bg-accent-blue rounded-r-full transition-all duration-200 ease-out;
+      }
+       /* Optional: Show bar on hover for inactive items too */
+      /* .sidebar-item:hover::before {
+          content: ''; @apply absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 bg-accent-blue/50 rounded-r-full transition-all duration-150 ease-out;
+      } */
+
+      .wizard-step {
+        @apply flex items-center w-full p-sm rounded-md cursor-pointer transition-colors duration-150 ease-in-out;
+      }
+      .wizard-step-inactive {
+        @apply bg-panel text-muted hover:bg-surface;
+      }
+      .wizard-step-active {
+        @apply bg-accent-blue text-white font-semibold;
+      }
+      .wizard-step-done {
+        @apply bg-panel text-accent-success;
+      }
+
+      .tag-pill {
+        @apply inline-flex items-center px-sm py-xs rounded-full text-xs font-semibold;
+      }
+
+      /* Horizontal Stepper Styles */
+      .h-stepper-item { @apply flex flex-col items-center; }
+      .h-stepper-circle { @apply w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2; }
+      .h-stepper-line { @apply h-0.5 flex-1; }
+      .h-stepper-active .h-stepper-circle { @apply bg-accent-blue border-accent-blue text-white; }
+      .h-stepper-done .h-stepper-circle { @apply bg-accent-success border-accent-success text-white; }
+      .h-stepper-inactive .h-stepper-circle { @apply border-panel bg-secondary text-muted; }
+      .h-stepper-done .h-stepper-line { @apply bg-accent-success; }
+      .h-stepper-inactive .h-stepper-line { @apply bg-panel; }
+    }
+
+    @tailwind base;
+    @tailwind utilities;
+
+    /* Basic scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #131620; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #8E94A8; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #E2E5EF; }
+
+    /* Body styles */
+    body { @apply bg-primary text-fg font-sans antialiased; } /* Added antialiased */
+
+    /* Lucide icon styles */
+    i[data-lucide] { width: 1em; height: 1em; display: inline-block; vertical-align: middle; }
+
+    /* Global Modal Backdrop */
+    .modal-backdrop { @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40; }
+    .modal-content { @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-lg shadow-xl p-lg z-50 w-full max-w-lg; }
+    /* Drawer Styles */
+    .drawer { @apply fixed top-0 right-0 bottom-0 bg-surface shadow-xl z-50 w-full max-w-md p-lg transform transition-transform duration-300 ease-in-out flex flex-col; } /* Added flex flex-col */
+    .drawer .drawer-content { @apply flex-1 overflow-y-auto; } /* Scrollable content area */
+    .drawer .drawer-footer { @apply mt-auto pt-lg border-t border-panel; } /* Footer area */
+    /* Tooltip Styles (Basic) */
+    .has-tooltip { @apply relative; } /* Apply to the element containing the text/icon */
+    .has-tooltip .tooltip {
+        @apply absolute hidden group-hover:block /* Use group-hover on parent */
+               bottom-full mb-2 left-1/2 -translate-x-1/2 /* Position above */
+               px-sm py-xs bg-panel text-fg-white text-xs rounded-md shadow-lg whitespace-nowrap z-30
+               pointer-events-none /* Prevent tooltip intercepting mouse */
+               opacity-0 group-hover:opacity-100 transition-opacity duration-150;
+    }
+
+    /* Workflow Node Status Pulse */
+    .node-status-running { @apply ring-2 ring-yellow-500 ring-offset-2 ring-offset-surface; }
+    .node-status-success { @apply ring-2 ring-accent-success ring-offset-2 ring-offset-surface; }
+    .node-status-fail { @apply ring-2 ring-accent-danger ring-offset-2 ring-offset-surface; }
+
+     /* Subtle focus animation for inputs */
+    .input-base:focus { @apply shadow-[0_0_0_3px_rgba(99,102,241,0.3)]; }
+
+    /* Floating Action Button for Mobile */
+    .fab { @apply fixed bottom-lg right-lg z-30; }
+
+     /* SVG line style for workflow */
+    .workflow-edge {
+        @apply stroke-muted fill-none;
+        stroke-width: 2;
+    }
+    .workflow-edge-active { /* Example if needed */
+        @apply stroke-accent-blue;
+    }
+    .arrowhead-muted { @apply fill-muted; }
+
+    /* Style for line being dragged */
+    .connecting-line {
+      stroke: theme(colors.accent.blue);
+      stroke-dasharray: 4 4;
+      stroke-width: 2;
+    }
+    .arrowhead-active { @apply fill-accent-blue; }
+
+  </style>
+  <!-- === Tailwind CDN Setup END === -->
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Alpine Debounce Plugin -->
+  <script defer src="https://unpkg.com/@alpinejs/debounce@3.x.x/dist/cdn.min.js"></script>
+  <!-- Lucide Icons (UMD version for createIcons) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Your App Logic -->
+  <script src="src/app.js"></script>
+
+  <style>
+    /* Prevent layout shift while Alpine initializes */
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+
+<body class="flex min-h-screen" x-data="app" x-init="init()" @keydown.escape.window="closeAllModals()" x-cloak>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Logo -->
+    <div class="flex items-center gap-sm mb-lg px-sm group has-tooltip"> <!-- Added group & has-tooltip -->
+      <div class="w-8 h-8 bg-accent-blue rounded-md flex items-center justify-center relative">
+          <i data-lucide="brain-circuit" class="w-5 h-5 text-white"></i>
+      </div>
+      <h1 class="text-xl font-bold text-fg-white">PromptVault</h1>
+      <!-- Tooltip -->
+       <span class="tooltip">AI Prompt Management</span>
+    </div>
+<!-- Navigation items -->
+<nav class="flex-1 space-y-xs mb-lg">
+   <p class="px-sm text-xs font-semibold text-muted uppercase tracking-wider mb-xs">Main</p>
+  <template x-for="item in navItems" :key="item.id">
+    <button @click="changeView(item.id)"
+      :class="currentView === item.id ? 'sidebar-item-active' : 'sidebar-item-inactive'"
+      class="sidebar-item w-full justify-between group has-tooltip"> <!-- Added group & has-tooltip -->
+      <div class="flex items-center gap-sm">
+          <i :data-lucide="item.icon" class="w-4 h-4"></i>
+          <span x-text="item.label"></span>
+      </div>
+      <span x-show="item.count !== null" x-text="item.count" class="text-xs bg-panel px-1.5 py-0.5 rounded-full"></span>
+       <!-- Tooltip -->
+       <span class="tooltip" x-text="`Go to ${item.label}`"></span>
+    </button>
+  </template>
+
+   <!-- Collections -->
+   <p class="px-sm text-xs font-semibold text-muted uppercase tracking-wider mt-md mb-xs has-tooltip group"> <!-- Tooltip on Header -->
+       Collections <i data-lucide="info" class="w-3 h-3 inline-block ml-xs"></i>
+       <span class="tooltip">Group related prompts together</span>
+   </p>
+   <template x-for="collection in collections" :key="collection.id">
+       <button class="sidebar-item sidebar-item-inactive w-full justify-between group has-tooltip">
+           <div class="flex items-center gap-sm">
+                <span class="w-2 h-2 rounded-full" :class="getCollectionColorClass(collection.color)"></span> <!-- Updated color mapping -->
+                <span x-text="collection.name"></span>
+           </div>
+           <span x-text="collection.count" class="text-xs bg-panel px-1.5 py-0.5 rounded-full"></span>
+           <span class="tooltip" x-text="`View ${collection.name} collection`"></span>
+       </button>
+   </template>
+   <button class="sidebar-item sidebar-item-inactive w-full text-muted group has-tooltip">
+       <div class="flex items-center gap-sm">
+           <i data-lucide="plus" class="w-4 h-4"></i>
+           <span>New Collection</span>
+       </div>
+       <span class="tooltip">Create a new prompt collection</span>
+   </button>
+
+</nav>
+
+<!-- Footer links -->
+<div class="mt-auto space-y-xs">
+  <button class="sidebar-item sidebar-item-inactive w-full group has-tooltip">
+    <i data-lucide="settings" class="w-4 h-4"></i> Settings
+     <span class="tooltip">Application Settings</span>
+  </button>
+  <button class="sidebar-item sidebar-item-inactive w-full group has-tooltip">
+    <i data-lucide="help-circle" class="w-4 h-4"></i> Help & Support
+     <span class="tooltip">Get Help</span>
+  </button>
+</div>
+
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 ml-64 p-lg overflow-auto relative"> <!-- Added relative for positioning -->
+<!-- ======================= -->
+<!-- == Dashboard View === -->
+<!-- ======================= -->
+<section x-show="currentView==='dashboard'" id="view-dashboard" class="animate-fade-in">
+    <!-- Welcome Header -->
+    <div class="flex flex-wrap gap-y-sm justify-between items-center mb-lg">
+        <div>
+            <h2 class="text-2xl font-bold text-fg-white">Welcome back!</h2>
+            <p class="text-muted">Here's your prompt activity overview.</p>
+        </div>
+         <button @click="changeView('create')" class="btn btn-primary">
+            <i data-lucide="plus" class="w-4 h-4 mr-sm"></i>
+            Create New Prompt
+        </button>
+    </div>
+
+    <!-- Empty State Onboarding -->
+    <template x-if="prompts.length === 0">
+        <div class="bg-surface rounded-lg p-lg text-center animate-fade-in">
+            <i data-lucide="rocket" class="w-12 h-12 text-accent-blue mx-auto mb-md"></i>
+            <h3 class="text-xl font-semibold text-fg-white mb-sm">Welcome to PromptVault!</h3>
+            <p class="text-muted mb-md">Ready to supercharge your AI interactions?</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+                <div class="bg-panel p-md rounded-md">
+                    <h4 class="font-semibold mb-xs text-fg">1. Create a Prompt</h4>
+                    <p class="text-xs text-muted">Click "Create New Prompt" to start writing or paste your first AI instruction.</p>
+                </div>
+                <div class="bg-panel p-md rounded-md">
+                    <h4 class="font-semibold mb-xs text-fg">2. Organize with Collections</h4>
+                    <p class="text-xs text-muted">Use collections (like folders) to group prompts by project or theme.</p>
+                </div>
+                <div class="bg-panel p-md rounded-md">
+                    <h4 class="font-semibold mb-xs text-fg">3. Use Templates</h4>
+                    <p class="text-xs text-muted">Create reusable prompt templates with variables for dynamic content.</p>
+                </div>
+            </div>
+            <button @click="changeView('create')" class="btn btn-primary mt-lg">
+                <i data-lucide="plus" class="w-4 h-4 mr-sm"></i> Create Your First Prompt
+            </button>
+        </div>
+    </template>
+
+    <!-- Stats Cards (Show only if prompts exist) -->
+    <template x-if="prompts.length > 0">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md mb-lg">
+            <!-- Stat Card Example with Click -->
+            <button @click="openStatDrilldown('Total Prompts')" class="card !bg-surface p-md text-left hover:shadow-xl hover:-translate-y-1 transition-all group has-tooltip">
+                <p class="text-sm text-muted mb-xs">Total Prompts</p>
+                <p class="text-3xl font-bold text-fg-white mb-sm" x-text="prompts.length"></p>
+                <span class="inline-flex items-center px-xs py-0.5 rounded-full text-xs font-medium bg-accent-success/20 text-accent-success animate-pulse-badge">
+                    <i data-lucide="arrow-up" class="w-3 h-3 mr-xs"></i> Growth TBD%
+                </span>
+                <span class="tooltip">View all prompts</span>
+            </button>
+             <button @click="openStatDrilldown('Prompt Usage')" class="card !bg-surface p-md text-left hover:shadow-xl hover:-translate-y-1 transition-all group has-tooltip">
+                <p class="text-sm text-muted mb-xs">Prompt Usage</p>
+                <p class="text-3xl font-bold text-fg-white mb-sm" x-text="prompts.reduce((sum, p) => sum + p.usage, 0)"></p>
+                <span class="inline-flex items-center px-xs py-0.5 rounded-full text-xs font-medium bg-accent-success/20 text-accent-success">
+                    <i data-lucide="arrow-up" class="w-3 h-3 mr-xs"></i> Growth TBD%
+                </span>
+                 <span class="tooltip">View usage statistics</span>
+            </button>
+            <button @click="openStatDrilldown('Templates Created')" class="card !bg-surface p-md text-left hover:shadow-xl hover:-translate-y-1 transition-all group has-tooltip">
+                <p class="text-sm text-muted mb-xs">Templates Created</p>
+                <p class="text-3xl font-bold text-fg-white mb-sm" x-text="templates.length"></p>
+                <span class="inline-flex items-center px-xs py-0.5 rounded-full text-xs font-medium bg-accent-success/20 text-accent-success">
+                   + Growth TBD
+                </span>
+                <span class="tooltip">View all templates</span>
+            </button>
+            <!-- Removed the generic 'Create New' card, button is at top -->
+        </div>
+    </template>
+
+    <!-- Search and Filter Section -->
+     <div class="mb-lg bg-surface p-md rounded-lg shadow">
+         <div class="flex flex-col md:flex-row gap-md items-center">
+             <div class="relative flex-1 w-full">
+                 <i data-lucide="search" class="absolute left-sm top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none z-10"></i>
+                 <input type="search" x-model.debounce.300ms="dashboardSearchTerm" placeholder="Search prompts, templates, tags..." class="input-base !pl-lg w-full relative">
+                  <!-- Basic Typeahead Example Placeholder -->
+                  <!-- ... (Typeahead dropdown would go here) ... -->
+             </div>
+             <div class="flex space-x-sm">
+                 <button @click="setDashboardFilter('all')" :class="{ 'tab-active': dashboardFilter === 'all' }" class="tab">All</button>
+                 <button @click="setDashboardFilter('my')" :class="{ 'tab-active': dashboardFilter === 'my' }" class="tab">My</button>
+                 <button @click="setDashboardFilter('shared')" :class="{ 'tab-active': dashboardFilter === 'shared' }" class="tab">Shared</button>
+                 <button @click="setDashboardFilter('templates')" :class="{ 'tab-active': dashboardFilter === 'templates' }" class="tab">Templates</button>
+             </div>
+         </div>
+         <!-- Filter Chips -->
+         <div class="mt-md flex flex-wrap gap-sm" x-show="availableDashboardTags.length > 0">
+              <span class="text-xs text-muted mr-sm shrink-0">Filter by tag:</span>
+              <template x-for="tag in availableDashboardTags" :key="tag">
+                  <button @click="toggleTagFilter(tag)"
+                          :class="dashboardActiveTags.includes(tag) ? 'bg-accent-blue text-white' : 'bg-panel text-muted hover:bg-secondary hover:text-fg'"
+                          class="tag-pill !px-sm !py-xs cursor-pointer transition-colors">
+                      <span x-text="tag"></span>
+                      <i x-show="dashboardActiveTags.includes(tag)" data-lucide="x" class="w-3 h-3 ml-xs -mr-xs shrink-0"></i>
+                  </button>
+              </template>
+              <button x-show="dashboardActiveTags.length > 0" @click="dashboardActiveTags = []" class="text-xs text-muted hover:text-accent-blue underline ml-auto shrink-0">Clear Tag Filters</button>
+         </div>
+     </div>
+    <!-- Recent Prompts Section -->
+    <div x-show="prompts.length > 0">
+        <div class="flex justify-between items-center mb-md">
+            <h3 class="text-xl font-semibold text-fg-white">Prompts</h3>
+            <button @click="showFilterDrawer = true" class="btn btn-ghost text-sm text-accent-blue">
+                View All / Filter <i data-lucide="sliders-horizontal" class="w-4 h-4 ml-xs"></i>
+            </button>
+        </div>
+        <!-- Prompt Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+            <template x-for="(prompt, index) in filteredDashboardItems" :key="prompt.id">
+                 <div class="card !bg-surface overflow-hidden group relative transition-all duration-150 hover:shadow-xl hover:-translate-y-px"
+                      x-transition:enter="transition ease-out duration-300"
+                      x-transition:enter-start="opacity-0 translate-y-2"
+                      x-transition:enter-end="opacity-100 translate-y-0"
+                      :style="`transition-delay: ${index * 50}ms`"> <!-- Staggered fade-in -->
+                     <div class="h-1.5 w-full" :class="getBorderColorClass(prompt.border_color).replace('border-', 'bg-')"></div>
+                     <div class="p-md">
+                         <h4 class="font-semibold text-fg-white mb-xs truncate" x-text="prompt.name"></h4>
+                         <p class="text-sm text-muted h-10 line-clamp-2 mb-sm" x-text="prompt.description"></p>
+                         <div class="flex flex-wrap gap-xs mb-md min-h-[24px]"> <!-- Min height for tags -->
+                             <template x-for="tag in prompt.tags" :key="tag.name">
+                                 <span class="tag-pill" :class="getTagColorClass(tag.color)" x-text="tag.name"></span>
+                             </template>
+                         </div>
+                         <div class="flex justify-end space-x-sm relative z-10"> <!-- Ensure buttons are clickable -->
+                             <!-- Quick Actions Menu (Hidden by default) -->
+                             <div class="absolute top-[-36px] right-[-8px] opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                 <button class="btn btn-ghost !p-xs">
+                                     <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                     <!-- Add dropdown logic here if needed -->
+                                 </button>
+                             </div>
+                             <button class="btn btn-secondary btn-sm !px-sm !py-xs text-xs">View</button>
+                             <button @click="changeView('create'); /* TODO: Load prompt data */" class="btn btn-primary btn-sm !px-sm !py-xs text-xs">Use</button>
+                         </div>
+                     </div>
+                 </div>
+            </template>
+             <!-- Empty state for filtered results -->
+              <div x-show="prompts.length > 0 && filteredDashboardItems.length === 0" class="text-muted text-center py-lg md:col-span-2 lg:col-span-3">
+                  No prompts match your search or filters.
+              </div>
+        </div>
+    </div>
+
+    <!-- Recent Templates Section -->
+    <div class="mt-lg" x-show="templates.length > 0">
+         <div class="flex justify-between items-center mb-md">
+          <h3 class="text-xl font-semibold text-fg-white">Recent Templates</h3>
+          <button class="btn btn-ghost text-sm text-accent-blue">
+              View All <i data-lucide="arrow-right" class="w-4 h-4 ml-xs"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <template x-for="template in templates.slice(0, 4)" :key="template.id"> <!-- Show limited number -->
+                <div class="card !bg-surface group relative transition-all duration-150 hover:shadow-xl hover:-translate-y-px">
+                    <div class="flex justify-between items-center mb-xs">
+                        <h4 class="font-semibold text-fg-white" x-text="template.name"></h4>
+                        <!-- Actions Menu (Example) -->
+                         <button class="text-muted hover:text-fg opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2">
+                            <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                         </button>
+                    </div>
+                     <p class="text-xs text-muted mb-md" x-text="`Updated ${template.updated} • ${template.variables} Variable${template.variables !== 1 ? 's' : ''}`"></p>
+                     <div class="flex space-x-sm">
+                          <button class="btn btn-primary btn-sm !px-sm !py-xs text-xs">Use Template</button>
+                          <button @click="changeView('template'); /* TODO: Load template data */" class="btn btn-secondary btn-sm !px-sm !py-xs text-xs">Edit</button>
+                     </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</section>
+
+<!-- =========================== -->
+<!-- == Create Prompt View === -->
+<!-- =========================== -->
+ <section x-show="currentView==='create'" id="view-create" class="animate-fade-in">
+    <div class="flex flex-col md:flex-row gap-lg">
+        <!-- Main Form Area (Moved first for better mobile layout) -->
+        <div class="flex-1 order-2 md:order-1">
+             <!-- Horizontal Stepper (Top) -->
+             <div class="mb-lg hidden md:flex items-center space-x-sm">
+                 <template x-for="(step, index) in wizardSteps" :key="step.id">
+                      <div class="flex items-center" :class="index === wizardSteps.length -1 ? '' : 'flex-1'">
+                           <div class="h-stepper-item" :class="{'h-stepper-active': wizardStep === index, 'h-stepper-done': wizardStep > index, 'h-stepper-inactive': wizardStep < index}">
+                               <button @click="goToWizardStep(index)" class="h-stepper-circle">
+                                    <i x-show="wizardStep > index" data-lucide="check" class="w-4 h-4"></i>
+                                    <span x-show="wizardStep <= index" x-text="index + 1"></span>
+                               </button>
+                               <span class="text-xs mt-xs text-center" x-text="step.label"></span>
+                           </div>
+                           <!-- Connector Line -->
+                           <div x-show="index < wizardSteps.length - 1" class="h-stepper-line" :class="{'h-stepper-done': wizardStep > index, 'h-stepper-inactive': wizardStep <= index}"></div>
+                      </div>
+                 </template>
+             </div>
+
+            <!-- Step Content -->
+            <div class="space-y-lg"> <!-- Increased spacing between form elements -->
+                <!-- Step 0: Basic Information -->
+                <div x-show="wizardStep === 0" class="space-y-md animate-fade-in">
+                     <h3 class="text-xl font-bold text-fg-white md:hidden" x-text="wizardSteps[0].label"></h3> <!-- Mobile Title -->
+                     <p class="text-sm text-muted">Start with the basics. These details help you find your prompt later.</p>
+                     <div>
+                         <label for="promptName" class="block text-sm font-medium text-fg mb-xs">Prompt Name <span class="text-accent-danger">*</span></label>
+                         <input type="text" id="promptName" x-model="newPrompt.name" @input="validatePromptName" @blur="validatePromptName"
+                                :class="{'border-accent-danger focus:ring-accent-danger/50': newPrompt.validation.nameError, 'border-accent-warn focus:ring-accent-warn/50': newPrompt.validation.duplicateName && !newPrompt.validation.nameError}"
+                                class="input-base" placeholder="e.g., Product Description Generator" required>
+                          <!-- Inline Validation Messages -->
+                          <p x-show="newPrompt.validation.nameError" class="text-xs text-accent-danger mt-xs" x-text="newPrompt.validation.nameError"></p>
+                          <p x-show="newPrompt.validation.duplicateName && !newPrompt.validation.nameError" class="text-xs text-accent-warn mt-xs">A prompt with this name already exists. Consider making it unique.</p>
+                          <p x-show="newPrompt.name && !newPrompt.validation.nameError" class="text-xs text-muted mt-xs">Slug suggestion: <code class="bg-panel px-1 rounded" x-text="suggestedSlug"></code></p>
+                     </div>
+                     <div>
+                         <label for="promptDescription" class="block text-sm font-medium text-fg mb-xs">Description</label>
+                         <div class="relative">
+                            <textarea id="promptDescription" x-model="newPrompt.description" rows="3" class="input-base pr-16" placeholder="What does this prompt do? (Optional)" maxlength="200"></textarea>
+                            <p class="absolute bottom-2 right-2 text-xs text-muted pointer-events-none"><span x-text="newPrompt.description.length"></span> / 200</p>
+                         </div>
+                     </div>
+                     <div>
+                         <label for="promptCollection" class="block text-sm font-medium text-fg mb-xs">Collection</label>
+                         <div class="flex gap-sm">
+                            <select id="promptCollection" x-model="newPrompt.collection" class="input-base flex-1">
+                                <option value="">Choose or create a collection...</option>
+                                <template x-for="collection in collections" :key="collection.id"> <option :value="collection.id" x-text="collection.name"></option> </template>
+                                <!-- Add "Create New" option later -->
+                            </select>
+                             <button class="btn btn-secondary shrink-0" title="Create New Collection"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                         </div>
+                     </div>
+                     <div>
+                         <label for="promptTags" class="block text-sm font-medium text-fg mb-xs">Tags</label>
+                         <div class="flex flex-wrap items-center gap-x-xs gap-y-sm p-sm border border-secondary rounded-md bg-panel min-h-[50px] focus-within:ring-2 focus-within:ring-accent-blue/50 focus-within:border-accent-blue transition-all duration-150">
+                            <template x-for="tag in newPrompt.tags" :key="tag">
+                                <span class="tag-pill bg-accent-blue/80 text-white flex items-center">
+                                    <span x-text="tag"></span>
+                                    <button @click="removeTag(tag)" class="ml-xs text-white/70 hover:text-white">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                    </button>
+                                </span>
+                            </template>
+                            <input type="text" id="promptTags" x-model="newPrompt.newTag" @keydown.enter.prevent="addTag()" @keydown.backspace="if (newPrompt.newTag === '' && newPrompt.tags.length > 0) removeTag(newPrompt.tags[newPrompt.tags.length - 1])" class="bg-transparent outline-none flex-1 text-sm p-1 min-w-[80px]" placeholder="+ Add tag">
+                         </div>
+                     </div>
+                     <div>
+                         <label for="promptModel" class="block text-sm font-medium text-fg mb-xs">Model</label>
+                         <select id="promptModel" x-model="newPrompt.model" class="input-base">
+                             <!-- Add grouping or starring later -->
+                             <option>Claude 3.5 Sonnet</option> <option>GPT-4 Omni</option> <option>Gemini Pro 1.5</option> <option>Mistral Large</option>
+                         </select>
+                         <p class="text-xs text-muted mt-xs">Tip: Claude 3.5 Sonnet is often good for creative tasks.</p>
+                     </div>
+                </div>
+                <!-- Step 1: Content -->
+                <div x-show="wizardStep === 1" class="space-y-md animate-fade-in">
+                     <h3 class="text-xl font-bold text-fg-white md:hidden" x-text="wizardSteps[1].label"></h3>
+                     <p class="text-sm text-muted">Enter the core prompt content. Use variables like <code class="text-xs bg-panel px-1 rounded">{variable_name}</code> if creating a template.</p>
+                     <div>
+                        <label for="promptContent" class="block text-sm font-medium text-fg mb-xs">Prompt Content</label>
+                        <textarea id="promptContent" x-model="newPrompt.content" rows="15" class="input-base font-mono text-sm !leading-relaxed" placeholder="Enter your prompt here..."></textarea>
+                     </div>
+                </div>
+                <!-- Step 2: Settings -->
+                <div x-show="wizardStep === 2" class="space-y-md animate-fade-in">
+                    <h3 class="text-xl font-bold text-fg-white md:hidden" x-text="wizardSteps[2].label"></h3>
+                     <p class="text-sm text-muted">Configure model parameters and prompt behavior.</p>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                         <div>
+                            <label for="temperature" class="block text-sm font-medium text-fg mb-xs">Temperature (<span x-text="newPrompt.settings.temperature.toFixed(1)"></span>)</label>
+                            <input type="range" id="temperature" x-model.number="newPrompt.settings.temperature" min="0" max="1" step="0.1" class="w-full h-2 bg-panel rounded-lg appearance-none cursor-pointer accent-accent-blue">
+                            <p class="text-xs text-muted mt-xs">Lower values = more focused, higher = more creative.</p>
+                         </div>
+                         <div>
+                            <label for="maxTokens" class="block text-sm font-medium text-fg mb-xs">Max Tokens</label>
+                            <input type="number" id="maxTokens" x-model.number="newPrompt.settings.max_tokens" class="input-base" placeholder="e.g., 500">
+                            <p class="text-xs text-muted mt-xs">Max length of the generated response.</p>
+                         </div>
+                     </div>
+                </div>
+                <!-- Step 3: Preview -->
+                <div x-show="wizardStep === 3" class="space-y-md animate-fade-in">
+                     <h3 class="text-xl font-bold text-fg-white md:hidden" x-text="wizardSteps[3].label"></h3>
+                     <p class="text-sm text-muted">Review your prompt configuration before saving.</p>
+                     <div class="card !bg-panel p-lg space-y-md"> <!-- Increased padding -->
+                        <h4 class="font-semibold text-lg text-fg-white" x-text="newPrompt.name"></h4>
+                        <p class="text-sm text-muted italic" x-text="newPrompt.description || 'No description provided.'"></p>
+                        <div class="grid grid-cols-2 gap-x-lg gap-y-sm text-sm">
+                            <div><strong class="text-muted font-medium block mb-xs">Model:</strong> <span x-text="newPrompt.model"></span></div>
+                            <div><strong class="text-muted font-medium block mb-xs">Collection:</strong> <span x-text="collections.find(c => c.id === newPrompt.collection)?.name || 'None'"></span></div>
+                            <div class="col-span-2"><strong class="text-muted font-medium block mb-xs">Tags:</strong>
+                                <span x-show="newPrompt.tags.length === 0">None</span>
+                                <div class="flex flex-wrap gap-xs">
+                                    <template x-for="tag in newPrompt.tags" :key="tag">
+                                        <span class="tag-pill bg-accent-blue/80 text-white" x-text="tag"></span>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                         <details class="text-sm border-t border-secondary pt-md group"> <!-- Added group -->
+                            <summary class="cursor-pointer text-muted hover:text-fg font-medium flex justify-between items-center list-none"> <!-- Removed list-none -->
+                                <span>Show Content & Settings</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 transition-transform transform group-open:rotate-180"></i> <!-- Updated icon class -->
+                            </summary>
+                            <div class="mt-md space-y-md">
+                                <div>
+                                    <h5 class="text-xs font-semibold uppercase text-muted mb-xs">Content</h5>
+                                    <pre class="text-xs bg-secondary p-sm rounded-md overflow-auto max-h-60" x-text="newPrompt.content || '[No Content]'"></pre>
+                                </div>
+                                <div>
+                                    <h5 class="text-xs font-semibold uppercase text-muted mb-xs">Settings</h5>
+                                    <pre class="text-xs bg-secondary p-sm rounded-md overflow-auto" x-text="JSON.stringify(newPrompt.settings, null, 2)"></pre>
+                                </div>
+                            </div>
+                         </details>
+                     </div>
+                     <!-- Optional: Add a 'Test Run' button here -->
+                       <button class="btn btn-secondary w-full mt-md">
+                           <i data-lucide="play-circle" class="w-4 h-4 mr-sm"></i> Test Run Prompt (Optional)
+                       </button>
+                </div>
+
+                <!-- Bottom Navigation (non-mobile) -->
+                <div class="hidden md:flex justify-between items-center pt-md border-t border-panel mt-lg">
+                    <button @click="prevWizardStep()" x-show="wizardStep > 0" class="btn btn-secondary"> <i data-lucide="arrow-left" class="w-4 h-4 mr-sm"></i> Back </button>
+                     <div x-show="wizardStep === 0" class="flex-1"></div> <!-- Placeholder to push next button right -->
+                     <button @click="nextWizardStep()" :disabled="wizardStep === 0 && !newPrompt.name" class="btn btn-primary min-w-[120px]"> <!-- Min width for consistency -->
+                         <span x-text="wizardStep === wizardSteps.length - 1 ? 'Save Prompt' : 'Next Step'"></span>
+                         <i :data-lucide="wizardStep === wizardSteps.length - 1 ? 'check' : 'arrow-right'" class="w-4 h-4 ml-sm"></i>
+                     </button>
+                </div>
+            </div>
+        </div>
+
+         <!-- Right Sidebar / Pro Tips (Moved second for mobile stacking) -->
+        <aside class="w-full md:w-72 flex-shrink-0 order-1 md:order-2 space-y-md"> <!-- Wider sidebar -->
+             <h2 class="text-lg font-semibold text-fg-white hidden md:block">Create New Prompt</h2>
+             <!-- Pro Tips Box (Collapsible) -->
+             <div class="bg-panel p-md rounded-md sticky top-lg"> <!-- Sticky tips -->
+                  <button @click="showProTips = !showProTips" class="flex justify-between items-center w-full mb-sm group">
+                      <h4 class="font-semibold text-fg-white">Pro Tips</h4>
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-muted transition-transform transform group-open:-rotate-180" :class="{'rotate-180': showProTips}"></i>
+                  </button>
+                  <div x-show="showProTips" x-transition class="space-y-sm">
+                     <ul class="space-y-xs text-xs text-muted list-disc list-inside">
+                         <li>Use structured XML tags like <code>&lt;example&gt;</code></li>
+                         <li>Define a clear persona for the AI</li>
+                         <li>Provide positive examples and negative constraints</li>
+                         <li>Iterate! Test and refine your prompts</li>
+                     </ul>
+                     <a href="#" class="text-xs text-accent-blue hover:underline">View full prompt guide <i data-lucide="arrow-right" class="w-3 h-3 inline"></i></a>
+                     <!-- Dynamic Tip Example -->
+                     <p x-show="prompts.filter(p => p.tags.length === 0).length > 2" class="text-xs text-accent-warn mt-sm border-t border-secondary pt-sm">
+                        <i data-lucide="lightbulb" class="w-3 h-3 inline mr-xs"></i> Consider adding tags to find prompts easier later!
+                     </p>
+                  </div>
+             </div>
+        </aside>
+    </div>
+
+    <!-- Floating Action Button (Mobile) -->
+    <div class="md:hidden fab">
+         <button @click="nextWizardStep()" :disabled="wizardStep === 0 && !newPrompt.name" class="btn btn-primary !rounded-full !p-md shadow-lg">
+             <i :data-lucide="wizardStep === wizardSteps.length - 1 ? 'check' : 'arrow-right'" class="w-5 h-5"></i>
+         </button>
+    </div>
+ </section>
+
+<!-- ============================= -->
+<!-- == Template Editor View === -->
+<!-- ============================= -->
+<section x-show="currentView==='template'" id="view-template" class="flex flex-col h-[calc(100vh-2*theme(spacing.lg))] animate-fade-in">
+    <!-- Top Bar -->
+    <div class="flex-shrink-0 flex flex-wrap items-center justify-between gap-sm p-sm bg-surface rounded-md mb-md">
+         <div class="flex items-center gap-sm flex-wrap">
+              <i data-lucide="layout-template" class="w-5 h-5 text-accent-blue"></i>
+             <h2 class="text-lg font-semibold text-fg-white">Template Editor</h2>
+             <span class="text-muted mx-xs hidden sm:inline">/</span>
+             <span class="text-fg truncate" x-text="currentTemplate.name"></span>
+         </div>
+         <div class="flex items-center gap-md">
+              <!-- View Mode Toggle (Focus/Split) -->
+              <div class="flex space-x-xs bg-panel p-xs rounded-md">
+                  <button @click="setTemplateViewMode('focus')" :class="templateViewMode === 'focus' ? 'bg-accent-blue text-white' : 'text-muted hover:bg-secondary'" class="px-sm py-xs rounded text-sm" title="Focus Mode"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+                  <button @click="setTemplateViewMode('split')" :class="templateViewMode === 'split' ? 'bg-accent-blue text-white' : 'text-muted hover:bg-secondary'" class="px-sm py-xs rounded text-sm" title="Split View"><i data-lucide="columns" class="w-4 h-4"></i></button>
+              </div>
+              <!-- Tabs (Conditional) -->
+              <div x-show="templateViewMode === 'focus'" class="flex space-x-xs bg-panel p-xs rounded-md">
+                  <button @click="setTemplateTab('code')" :class="templateTab === 'code' ? 'bg-accent-blue text-white' : 'text-muted hover:bg-secondary hover:text-fg'" class="px-sm py-xs rounded text-sm font-medium transition-colors duration-150">Code</button>
+                  <button @click="setTemplateTab('preview')" :class="templateTab === 'preview' ? 'bg-accent-blue text-white' : 'text-muted hover:bg-secondary hover:text-fg'" class="px-sm py-xs rounded text-sm font-medium transition-colors duration-150">Preview</button>
+                  <button @click="setTemplateTab('settings')" :class="templateTab === 'settings' ? 'bg-accent-blue text-white' : 'text-muted hover:bg-secondary hover:text-fg'" class="px-sm py-xs rounded text-sm font-medium transition-colors duration-150">Settings</button>
+              </div>
+               <!-- History Button -->
+               <button @click="showHistoryPanel = !showHistoryPanel" class="btn btn-secondary" title="Version History">
+                   <i data-lucide="history" class="w-4 h-4"></i>
+               </button>
+              <!-- Save Button with Animation -->
+              <button @click="saveTemplate()" class="btn btn-primary min-w-[110px]" :disabled="templateSaving"> <!-- Fixed width -->
+                    <span x-show="!templateSaving">Save</span>
+                    <i x-show="templateSaving" data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+              </button>
+         </div>
+    </div>
+
+    <!-- Main Content Area (Handles Split View) -->
+    <div class="flex-1 flex gap-md overflow-hidden">
+        <!-- Left Sidebar (Variables) -->
+        <aside class="w-72 flex-shrink-0 bg-surface rounded-md p-md flex flex-col overflow-y-auto">
+            <div class="flex justify-between items-center mb-md">
+                <h3 class="font-semibold text-fg-white truncate" x-text="currentTemplate.name"></h3>
+                <button class="text-muted hover:text-fg"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+             </div>
+
+             <!-- Variables Section -->
+             <div class="mb-md">
+                 <div class="flex justify-between items-center mb-sm">
+                     <h4 class="text-sm font-semibold text-fg flex items-center">
+                        Variables
+                        <span x-show="currentTemplate.variables.length > 0" class="ml-xs bg-panel text-xs font-normal px-1.5 py-0.5 rounded-full" x-text="currentTemplate.variables.length"></span>
+                     </h4>
+                     <button class="btn btn-secondary btn-sm !px-sm !py-xs text-xs"> <i data-lucide="plus" class="w-3 h-3 mr-xs"></i> Add </button>
+                 </div>
+                 <div class="space-y-sm flex-1"> <!-- Allow variables list to scroll -->
+                     <template x-for="(variable, index) in currentTemplate.variables.sort((a,b) => a.order - b.order)" :key="variable.id">
+                         <div class="bg-panel p-sm rounded group relative">
+                             <!-- Move Up/Down Arrows -->
+                             <div class="absolute top-1 right-1 flex flex-col opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button @click="moveVariable(index, -1)" :disabled="index === 0" class="disabled:opacity-30"><i data-lucide="arrow-up" class="w-3 h-3 text-muted hover:text-fg"></i></button>
+                                  <button @click="moveVariable(index, 1)" :disabled="index === currentTemplate.variables.length - 1" class="disabled:opacity-30"><i data-lucide="arrow-down" class="w-3 h-3 text-muted hover:text-fg"></i></button>
+                             </div>
+                             <label :for="'var-' + index" class="block text-xs font-medium text-accent-blue mb-xs" x-text="`{${variable.name}}`"></label>
+                             <input :id="'var-' + index" type="text" x-model="variable.value" class="input-base !py-xs !text-sm" placeholder="Enter value for preview...">
+                             <p class="text-xs text-muted mt-xs" x-text="`Type: ${variable.type} ${variable.required ? '• Required' : ''}`"></p>
+                         </div>
+                     </template>
+                    <p x-show="currentTemplate.variables.length === 0" class="text-xs text-muted text-center py-sm">No variables defined.</p>
+                 </div>
+             </div>
+
+             <!-- Format Section -->
+             <div class="mb-md">
+                  <h4 class="text-sm font-semibold text-fg mb-sm">Format</h4>
+                  <label class="flex items-center justify-between cursor-pointer">
+                      <span class="text-sm text-muted">Syntax Highlighting</span>
+                       <div class="relative">
+                            <input type="checkbox" x-model="currentTemplate.settings.syntaxHighlighting" class="sr-only peer">
+                            <div class="w-10 h-5 bg-panel rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent-blue"></div>
+                       </div>
+                  </label>
+             </div>
+        </aside>
+
+        <!-- Editor/Preview Pane(s) -->
+         <div class="flex-1 flex gap-md overflow-hidden" :class="templateViewMode === 'split' ? 'flex-row' : 'flex-col'">
+             <!-- Code Editor Area -->
+             <div class="bg-surface rounded-md overflow-hidden flex flex-col"
+                  :class="templateViewMode === 'split' ? 'flex-1' : (templateTab === 'code' ? 'flex-1' : 'hidden')">
+                  <!-- Editor Header (Optional: Show filename in split view) -->
+                   <div x-show="templateViewMode === 'split'" class="p-sm text-xs text-muted border-b border-panel">Code Editor</div>
+                   <!-- Line Numbers & Textarea -->
+                   <div class="flex-1 flex overflow-hidden">
+                        <div class="w-12 flex-shrink-0 bg-panel text-right p-sm text-muted font-mono text-sm overflow-y-auto select-none">
+                            <template x-for="i in (currentTemplate.code.split('\n').length || 1)" :key="i">
+                                <div x-text="i"></div>
+                            </template>
+                        </div>
+                        <textarea x-model="currentTemplate.code" @input="renderPreview" <!-- Trigger preview on input -->
+                                  class="flex-1 p-sm bg-surface text-fg font-mono text-sm !leading-relaxed outline-none resize-none overflow-auto whitespace-pre"
+                                  placeholder="Enter your template code here..."
+                                  spellcheck="false"
+                                  :class="{ 'syntax-highlighting-enabled': currentTemplate.settings.syntaxHighlighting }"
+                                  >
+                        </textarea>
+                   </div>
+                    <!-- Error indicator -->
+                    <div x-show="templateHasError" class="p-xs bg-accent-danger/20 text-accent-danger text-xs flex items-center gap-xs">
+                        <i data-lucide="alert-triangle" class="w-3 h-3"></i> Potential issue detected (e.g., unmatched braces). Check preview.
+                    </div>
+             </div>
+
+             <!-- Preview Area -->
+              <div class="bg-surface rounded-md overflow-hidden flex flex-col"
+                   :class="templateViewMode === 'split' ? 'flex-1' : (templateTab === 'preview' ? 'flex-1' : 'hidden')">
+                    <!-- Preview Header (Optional) -->
+                   <div x-show="templateViewMode === 'split'" class="p-sm text-xs text-muted border-b border-panel">Live Preview</div>
+                    <!-- Preview Content -->
+                   <div class="flex-1 p-md overflow-auto">
+                        <pre class="text-sm text-fg whitespace-pre-wrap" x-text="renderPreview()"></pre>
+                   </div>
+             </div>
+
+             <!-- Settings Area (Only in focus mode) -->
+             <div x-show="templateViewMode === 'focus' && templateTab === 'settings'" class="flex-1 bg-surface rounded-md p-lg overflow-auto animate-fade-in space-y-md">
+                 <h4 class="text-lg font-semibold mb-sm">Template Settings</h4>
+                  <div>
+                     <label for="templateNameSettings" class="block text-sm font-medium text-fg mb-xs">Template Name</label>
+                     <input type="text" id="templateNameSettings" x-model="currentTemplate.name" class="input-base">
+                  </div>
+                   <div>
+                     <label for="templateDescSettings" class="block text-sm font-medium text-fg mb-xs">Description</label>
+                     <textarea id="templateDescSettings" x-model="currentTemplate.description" rows="3" class="input-base"></textarea>
+                  </div>
+             </div>
+         </div>
+
+    </div>
+
+     <!-- Version History Panel (Drawer) -->
+     <div x-show="showHistoryPanel" @click.away="showHistoryPanel = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="modal-backdrop z-40"></div>
+     <aside x-show="showHistoryPanel" class="drawer animate-slide-in-right z-50">
+         <div class="flex justify-between items-center mb-md">
+             <h3 class="text-lg font-semibold text-fg-white">Version History</h3>
+             <button @click="showHistoryPanel = false" class="text-muted hover:text-fg"><i data-lucide="x" class="w-5 h-5"></i></button>
+         </div>
+         <div class="drawer-content space-y-sm"> <!-- Scrollable content -->
+             <template x-for="version in currentTemplate.history.slice().reverse()" :key="version.timestamp">
+                 <div class="bg-panel p-sm rounded group relative">
+                     <p class="text-xs text-muted mb-xs" x-text="new Date(version.timestamp).toLocaleString()"></p>
+                     <pre class="text-xs text-fg line-clamp-3" x-text="version.code"></pre>
+                      <button @click="restoreHistoryVersion(version)" class="absolute top-2 right-2 btn btn-secondary btn-sm !p-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                          <i data-lucide="rotate-ccw" class="w-3 h-3 mr-xs"></i> Restore
+                      </button>
+                 </div>
+             </template>
+             <p x-show="currentTemplate.history.length === 0" class="text-sm text-muted text-center py-lg">No saved history.</p>
+         </div>
+     </aside>
+</section>
+
+<!-- ============================== -->
+<!-- == Workflow Builder View === -->
+<!-- ============================== -->
+<section x-show="currentView==='workflow'" id="view-workflow" class="flex h-[calc(100vh-2*theme(spacing.lg))] gap-md animate-fade-in">
+     <!-- Node Palette Sidebar -->
+    <aside class="w-60 flex-shrink-0 bg-surface rounded-md p-md overflow-y-auto">
+        <h3 class="text-lg font-semibold text-fg-white mb-md">Nodes</h3>
+        <!-- Standard Nodes -->
+         <div class="space-y-sm mb-lg">
+            <p class="text-xs text-muted uppercase font-semibold mb-xs">Standard</p>
+             <div class="card !bg-panel p-sm cursor-grab active:cursor-grabbing" draggable="true" @dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ type: 'input', label: 'Input Node' }))">
+                <p class="font-semibold text-sm text-fg-white">Input Node</p><p class="text-xs text-muted">Defines starting data</p>
+             </div>
+             <div class="card !bg-panel p-sm cursor-grab active:cursor-grabbing" draggable="true" @dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ type: 'llmCall', label: 'LLM Call' }))">
+                <p class="font-semibold text-sm text-fg-white">LLM Call</p><p class="text-xs text-muted">Runs a prompt</p>
+             </div>
+             <div class="card !bg-panel p-sm cursor-grab active:cursor-grabbing" draggable="true" @dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ type: 'code', label: 'Code Execution' }))">
+                 <p class="font-semibold text-sm text-fg-white">Code Execution</p><p class="text-xs text-muted">Runs custom JS/Python</p>
+             </div>
+             <div class="card !bg-panel p-sm cursor-grab active:cursor-grabbing" draggable="true" @dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ type: 'output', label: 'Output Node' }))">
+                <p class="font-semibold text-sm text-fg-white">Output Node</p><p class="text-xs text-muted">Displays final result</p>
+             </div>
+         </div>
+         <!-- Reusable Node Templates -->
+         <div class="space-y-sm" x-show="nodeTemplates.length > 0">
+            <p class="text-xs text-muted uppercase font-semibold mb-xs">My Templates</p>
+             <template x-for="nt in nodeTemplates" :key="nt.name">
+                 <div class="card !bg-panel p-sm cursor-grab active:cursor-grabbing border-l-2 border-accent-teal" draggable="true" @dragstart="event.dataTransfer.setData('text/plain', JSON.stringify(nt))">
+                     <p class="font-semibold text-sm text-fg-white" x-text="nt.name"></p>
+                     <p class="text-xs text-muted" x-text="`Type: ${nt.type}`"></p>
+                 </div>
+             </template>
+         </div>
+    </aside>
+
+    <!-- Main Canvas & Properties Area -->
+    <div class="flex-1 flex flex-col gap-md overflow-hidden">
+         <!-- Toolbar -->
+        <div class="flex-shrink-0 flex flex-wrap items-center justify-between gap-sm p-sm bg-surface rounded-md">
+             <div class="flex items-center gap-sm">
+                 <h2 class="text-lg font-semibold text-fg-white">Workflow: New Product Copy Flow</h2>
+                  <!-- Workflow Theme Picker Example -->
+                  <select x-model="workflowThemeColor" class="input-base !py-xs !px-sm !w-auto !text-xs !border-transparent focus:!border-accent-blue">
+                     <option value="blue">Theme: Default</option>
+                     <option value="success">Theme: Green</option>
+                     <option value="danger">Theme: Red</option>
+                  </select>
+             </div>
+             <div class="flex items-center gap-sm">
+                 <button class="btn btn-secondary"><i data-lucide="save" class="w-4 h-4 mr-sm"></i> Save</button>
+                 <button @click="runWorkflow()" class="btn btn-primary min-w-[130px]" :disabled="workflowRunning">
+                     <i :data-lucide="workflowRunning ? 'loader-2' : 'play'" class="w-4 h-4 mr-sm" :class="{'animate-spin': workflowRunning}"></i>
+                     <span x-text="workflowRunning ? 'Running...' : 'Run Workflow'"></span>
+                 </button>
+             </div>
+        </div>
+         <!-- Canvas Area -->
+        <div class="flex-1 bg-secondary rounded-md relative overflow-auto p-lg" id="workflow-canvas"
+             @dblclick.self="/* TODO: Add node at event.clientX, event.clientY */"
+             @dragover.prevent @drop.prevent="/* TODO: Handle node drop from palette */">
+            <!-- Nodes -->
+            <template x-for="node in workflowNodes" :key="node.id">
+                <div :data-node-id="node.id"
+                     class="absolute card !p-sm !bg-panel w-48 select-none border-2 focus:outline-none cursor-grab active:cursor-grabbing"
+                     :class="[
+                        selectedNode?.id === node.id ? 'border-accent-blue shadow-lg z-20' : 'border-transparent z-10', /* Increase z-index when selected */
+                        workflowRunning && currentWorkflowStep === node.id ? 'ring-2 ring-offset-2 ring-offset-secondary ring-accent-blue' : '',
+                        node.status === 'running' ? 'node-status-running' : (node.status === 'success' ? 'node-status-success' : (node.status === 'fail' ? 'node-status-fail' : ''))
+                     ]"
+                     :style="`left: ${node.x}px; top: ${node.y}px; transition: box-shadow 0.1s, border-color 0.1s, transform 0.1s;`"
+                     @mousedown="startDrag($event, node)" @click.stop="selectedNode = node" tabindex="0">
+                    <div class="flex items-center gap-xs mb-xs">
+                         <span class="w-2 h-2 rounded-full flex-shrink-0" :class="getNodeColorClass(node, 'bg')"></span>
+                        <p class="text-sm font-semibold text-fg-white flex-1 truncate" x-text="node.label"></p>
+                         <!-- Node Status Icon -->
+                         <i x-show="node.status === 'running'" data-lucide="loader-2" class="w-3 h-3 text-yellow-500 animate-spin shrink-0"></i>
+                         <i x-show="node.status === 'success'" data-lucide="check-circle" class="w-3 h-3 text-accent-success shrink-0"></i>
+                         <i x-show="node.status === 'fail'" data-lucide="x-circle" class="w-3 h-3 text-accent-danger shrink-0"></i>
+                    </div>
+                    <p class="text-xs text-muted truncate" x-text="node.description"></p>
+                    <!-- Input/Output Handles -->
+                    <div @mousedown.stop="startConnection($event, node)" @mouseup.stop <!-- Prevent node drag/select -->
+                         class="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-muted border-2 border-panel ring-1 ring-muted cursor-crosshair hover:ring-2 hover:ring-accent-blue hover:bg-accent-blue z-30 transition-all" title="Input"></div>
+                    <div @mousedown.stop="startConnection($event, node)" @mouseup.stop
+                         class="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-muted border-2 border-panel ring-1 ring-muted cursor-crosshair hover:ring-2 hover:ring-accent-blue hover:bg-accent-blue z-30 transition-all" title="Output"></div>
+                </div>
+            </template>
+             <!-- Edges SVG Layer -->
+             <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 5;">
+                <defs>
+                    <marker id="arrowhead-muted" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="strokeWidth"> <polygon points="0 0, 10 3.5, 0 7" class="arrowhead-muted" /> </marker>
+                     <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="strokeWidth"> <polygon points="0 0, 10 3.5, 0 7" class="arrowhead-active" /> </marker>
+                </defs>
+                 <!-- Existing Edges -->
+                 <template x-for="edge in workflowEdges" :key="`${edge.from}-${edge.to}`">
+                     <path :d="getEdgePath(edge)" class="workflow-edge" marker-end="url(#arrowhead-muted)" />
+                 </template>
+                  <!-- Line being dragged -->
+                  <line x-show="isConnecting"
+                       :x1="connectionStartNode ? connectionStartNode.x + (nodeWidth / 2) : 0" <!-- Adjust x/y based on node size/handle pos -->
+                       :y1="connectionStartNode ? connectionStartNode.y + (nodeHeight / 2) : 0"
+                       :x2="connectionCurrentPos.x - $('#workflow-canvas').getBoundingClientRect().left"
+                       :y2="connectionCurrentPos.y - $('#workflow-canvas').getBoundingClientRect().top"
+                       class="connecting-line" marker-end="url(#arrowhead-active)" />
+             </svg>
+             <!-- Mini-map Placeholder -->
+             <!-- ... (Mini-map div) ... -->
+        </div>
+    </div>
+
+    <!-- Properties Panel -->
+    <aside x-show="selectedNode"
+           x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+           x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 translate-x-4"
+           class="w-72 flex-shrink-0 bg-surface rounded-md p-md overflow-y-auto flex flex-col" style="z-index: 20;"> <!-- Added flex flex-col -->
+         <div class="flex justify-between items-center mb-md flex-shrink-0"> <!-- Prevent header shrink -->
+             <h3 class="text-lg font-semibold text-fg-white">Properties</h3>
+             <button @click="selectedNode = null" class="text-muted hover:text-fg"><i data-lucide="x" class="w-5 h-5"></i></button>
+         </div>
+         <div x-if="selectedNode" class="space-y-md flex-1 overflow-y-auto pr-xs"> <!-- Scrollable content -->
+            <div>
+                <label :for="'node-label-'+selectedNode.id" class="block text-sm font-medium text-fg mb-xs">Node Label</label>
+                <input type="text" :id="'node-label-'+selectedNode.id" x-model="selectedNode.label" class="input-base">
+            </div>
+             <div>
+                <label :for="'node-desc-'+selectedNode.id" class="block text-sm font-medium text-fg mb-xs">Description</label>
+                <textarea :id="'node-desc-'+selectedNode.id" x-model="selectedNode.description" rows="2" class="input-base"></textarea>
+            </div>
+            <!-- Node-specific properties -->
+             <div x-show="selectedNode.type === 'llmCall'">
+                <label :for="'node-template-'+selectedNode.id" class="block text-sm font-medium text-fg mb-xs">Prompt Template</label>
+                <select :id="'node-template-'+selectedNode.id" x-model="selectedNode.settings.templateId" class="input-base">
+                    <option value="">Select template...</option>
+                     <template x-for="template in templates" :key="template.id">
+                         <option :value="template.id" x-text="template.name"></option>
+                     </template>
+                </select>
+             </div>
+            <div x-show="selectedNode.type === 'input'">
+                 <label :for="'node-input-'+selectedNode.id" class="block text-sm font-medium text-fg mb-xs">Input Schema (JSON)</label>
+                 <textarea :id="'node-input-'+selectedNode.id" rows="3" class="input-base font-mono !text-xs" placeholder='{ "topic": "string" }'></textarea>
+             </div>
+              <div x-show="selectedNode.type === 'output'">
+                 <label class="block text-sm font-medium text-fg mb-xs">Output Data (Example)</label>
+                 <pre class="text-xs bg-panel p-sm rounded max-h-40 overflow-auto">{ "result": "..." }</pre>
+             </div>
+             <div x-show="selectedNode.type === 'code'">
+                <label :for="'node-code-'+selectedNode.id" class="block text-sm font-medium text-fg mb-xs">Code (Javascript)</label>
+                <textarea :id="'node-code-'+selectedNode.id" rows="5" class="input-base font-mono !text-xs" placeholder='return { result: input.data + " processed" };'></textarea>
+             </div>
+
+         </div>
+         <!-- Panel Footer Actions -->
+          <div class="mt-auto pt-md border-t border-panel space-y-sm flex-shrink-0"> <!-- Prevent footer shrink -->
+              <button class="btn btn-secondary w-full">
+                  <i data-lucide="copy-plus" class="w-4 h-4 mr-sm"></i> Save Node as Template
+              </button>
+             <button class="btn btn-danger w-full">
+                <i data-lucide="trash-2" class="w-4 h-4 mr-sm"></i> Delete Node
+             </button>
+         </div>
+    </aside>
+</section>
+
+<!-- ======================= -->
+<!-- == Modals & Drawers === -->
+<!-- ======================= -->
+
+<!-- Dashboard Stat Modal -->
+<div x-show="showStatModal" @click.away="showStatModal = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="modal-backdrop z-40"></div>
+<div x-show="showStatModal" class="modal-content max-w-2xl z-50" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+    <div class="flex justify-between items-center mb-md">
+         <h3 class="text-lg font-semibold text-fg-white" x-text="statModalTitle"></h3>
+         <button @click="showStatModal = false" class="text-muted hover:text-fg"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="max-h-[60vh] overflow-y-auto space-y-sm pr-sm"> <!-- Added padding-right for scrollbar -->
+        <template x-for="(item, index) in statModalItems" :key="index">
+            <div class="bg-panel p-sm rounded hover:bg-secondary transition-colors"> <!-- Hover state -->
+                <p class="font-medium text-fg text-sm" x-text="item.name"></p>
+                <p class="text-xs text-muted" x-text="item.details"></p>
+            </div>
+        </template>
+        <p x-show="statModalItems.length === 0" class="text-muted text-center py-md">No items found.</p>
+    </div>
+</div>
+
+<!-- Dashboard Filter Drawer -->
+ <div x-show="showFilterDrawer" @click.away="showFilterDrawer = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="modal-backdrop z-40"></div>
+ <aside x-show="showFilterDrawer" class="drawer animate-slide-in-right z-50">
+     <div class="flex justify-between items-center mb-lg flex-shrink-0"> <!-- Header -->
+         <h3 class="text-lg font-semibold text-fg-white">Filter Prompts</h3>
+         <button @click="showFilterDrawer = false" class="text-muted hover:text-fg"><i data-lucide="x" class="w-5 h-5"></i></button>
+     </div>
+     <div class="drawer-content space-y-md"> <!-- Scrollable Content -->
+         <div>
+             <label class="block text-sm font-medium text-fg mb-xs">Date Range</label>
+             <select class="input-base">
+                 <option>Any time</option> <option>Last 7 days</option> <option>Last 30 days</option> <option>Custom...</option>
+             </select>
+         </div>
+         <div>
+             <label class="block text-sm font-medium text-fg mb-xs">Sort By</label>
+             <select class="input-base">
+                 <option>Last Modified</option> <option>Date Created</option> <option>Name</option>
+             </select>
+         </div>
+          <div>
+             <label class="block text-sm font-medium text-fg mb-xs">Tags</label>
+             <div class="max-h-40 overflow-y-auto space-y-xs bg-panel p-sm rounded border border-secondary">
+                 <template x-for="tag in availableDashboardTags" :key="tag">
+                     <label class="flex items-center space-x-sm cursor-pointer p-xs hover:bg-secondary rounded">
+                         <input type="checkbox" :value="tag" @change="toggleTagFilter(tag)" :checked="dashboardActiveTags.includes(tag)" class="rounded text-accent-blue focus:ring-accent-blue/50 bg-secondary border-panel shrink-0">
+                         <span class="text-sm" x-text="tag"></span>
+                     </label>
+                 </template>
+                  <p x-show="availableDashboardTags.length === 0" class="text-xs text-muted p-xs">No tags available.</p>
+             </div>
+         </div>
+         <!-- Add more filters: Collections, Models etc. -->
+     </div>
+     <div class="drawer-footer flex gap-sm flex-shrink-0"> <!-- Footer -->
+        <button @click="dashboardActiveTags=[]; /* Clear other filters */" class="btn btn-secondary flex-1">Clear Filters</button>
+        <button @click="showFilterDrawer = false" class="btn btn-primary flex-1">Apply</button>
+     </div>
+ </aside>
+
+  </main>
+
+  <!-- Add script to define nodeWidth/Height used in SVG path calculation -->
+  <script>
+      // Define these globally or within the Alpine component if preferred
+      const nodeWidth = 192; // Based on w-48 class (12rem = 192px)
+      const nodeHeight = 70; // Approximate height based on content
+       // Helper for getting element coordinates relative to the canvas
+      function getCanvasCoords(clientX, clientY) {
+          const canvas = document.getElementById('workflow-canvas');
+          if (!canvas) return { x: clientX, y: clientY };
+          const rect = canvas.getBoundingClientRect();
+          return {
+              x: clientX - rect.left + canvas.scrollLeft,
+              y: clientY - rect.top + canvas.scrollTop,
+          };
+      }
+  </script>
+
+</body>
+</html>
