@@ -1,0 +1,82 @@
+[
+  {
+    "id": "lib-001",
+    "title": "Modello: Email Marketing - Lancio Prodotto",
+    "text": "Oggetto: Scopri in Anteprima: {{nome_prodotto}}!\n\nCiao {{nome_cliente}},\n\nSiamo entusiasti di annunciare il lancio del nostro nuovo prodotto/servizio: **{{nome_prodotto}}**!\n\n{{nome_prodotto}} è stato progettato per aiutarti a {{beneficio_principale}} grazie a caratteristiche innovative come:\n- {{caratteristica_1}}\n- {{caratteristica_2}}\n- {{caratteristica_3}}\n\nPer celebrare il lancio, ti offriamo {{offerta_speciale}} per un periodo limitato.\n\nScopri di più e approfitta dell'offerta:\n[{{link_scopri_di_piu}}]\n\nNon vediamo l'ora di sapere cosa ne pensi!\n\nCordiali saluti,\nIl Team di {{nome_azienda}}",
+    "translation_en": "Subject: Discover in Preview: {{product_name}}!\n\nHi {{customer_name}},\n\nWe're excited to announce the launch of our new product/service: **{{product_name}}**!\n\n{{product_name}} is designed to help you {{main_benefit}} thanks to innovative features like:\n- {{feature_1}}\n- {{feature_2}}\n- {{feature_3}}\n\nTo celebrate the launch, we're offering you {{special_offer}} for a limited time.\n\nFind out more and take advantage of the offer:\n[{{learn_more_link}}]\n\nWe can't wait to hear what you think!\n\nBest regards,\nThe {{company_name}} Team",
+    "tags": ["#email", "#marketing", "#lancio_prodotto", "#vendite"],
+    "aiModel": "ChatGPT-4o",
+    "notes": "Modello email per annunciare un nuovo prodotto ai clienti esistenti. Personalizza benefici, caratteristiche e offerta.",
+    "imageUrl": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+    "id": "lib-002",
+    "title": "Modello: Post Social Media Coinvolgente",
+    "text": "Crea un post coinvolgente per {{piattaforma_social}} (es. LinkedIn, Instagram, Facebook) sull'argomento '{{argomento}}'.\n\nIncludi:\n- Un'apertura che catturi l'attenzione (domanda, statistica scioccante, citazione).\n- 2-3 punti chiave o consigli utili relativi a {{argomento}}.\n- Un invito all'azione chiaro (es. commenta, visita il link, condividi).\n- 3-5 hashtag pertinenti e popolari.\n\nTono desiderato: {{tono}} (es. informativo, divertente, professionale, ispiratore).",
+    "translation_en": "Create an engaging post for {{social_platform}} (e.g., LinkedIn, Instagram, Facebook) on the topic '{{topic}}'.\n\nInclude:\n- An attention-grabbing opener (question, shocking statistic, quote).\n- 2-3 key points or useful tips related to {{topic}}.\n- A clear call to action (e.g., comment, visit link, share).\n- 3-5 relevant and popular hashtags.\n\nDesired tone: {{tone}} (e.g., informative, fun, professional, inspirational).",
+    "tags": ["#social_media", "#marketing", "#contenuti", "#engagement"],
+    "aiModel": "Claude 3 Sonnet",
+    "notes": "Genera bozze di post per diverse piattaforme social. Specifica bene piattaforma, argomento e tono.",
+    "imageUrl": "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+    "id": "lib-003",
+    "title": "Prompt: Sintesi Testo Lungo",
+    "text": "Riassumi il seguente testo in {{numero_punti}} punti chiave principali. Ogni punto deve essere conciso e catturare l'essenza dell'informazione corrispondente nel testo originale. Mantieni un tono neutro e oggettivo.\n\nTesto da riassumere:\n\"\"\"\n{{testo_originale}}\n\"\"\"",
+    "translation_en": "Summarize the following text into {{number_of_points}} main key points. Each point should be concise and capture the essence of the corresponding information in the original text. Maintain a neutral and objective tone.\n\nText to summarize:\n\"\"\"\n{{original_text}}\n\"\"\"",
+    "tags": ["#sintesi", "#riassunto", "#produttivita", "#comprensione"],
+    "aiModel": "Qualsiasi Modello",
+    "notes": "Utile per estrarre rapidamente le informazioni chiave da articoli, report o documenti lunghi. Incolla il testo da riassumere.",
+    "imageUrl": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+    "id": "lib-004",
+    "title": "Prompt: Traduzione EN > IT Specifica",
+    "text": "Traduci il seguente testo dall'inglese all'italiano. Presta particolare attenzione a mantenere il tono {{tono_originale}} (es. formale, informale, tecnico) e a tradurre accuratamente eventuali termini specifici del settore {{settore_specifico}}.\n\nTesto Inglese:\n\"\"\"\n{{testo_inglese}}\n\"\"\"\n\nTesto Italiano Tradotto:",
+    "translation_en": "Translate the following text from English to Italian. Pay close attention to maintaining the {{original_tone}} tone (e.g., formal, informal, technical) and accurately translating any specific terms from the {{specific_sector}} sector.\n\nEnglish Text:\n\"\"\"\n{{english_text}}\n\"\"\"\n\nTranslated Italian Text:",
+    "tags": ["#traduzione", "#inglese", "#italiano", "#localizzazione"],
+    "aiModel": "ChatGPT-4o",
+    "notes": "Ottimo per traduzioni che richiedono attenzione al contesto, al tono e alla terminologia specifica.",
+    "imageUrl": "https://images.unsplash.com/photo-1543286386-713bdd548da4?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+    "id": "lib-005",
+    "title": "Modello: Brainstorming Nomi Prodotto/Azienda",
+    "text": "Genera {{numero_nomi}} nomi creativi e memorabili per un nuovo {{tipo_attivita}} (es. software, consulenza, negozio online) nel settore {{settore}}. Il target di riferimento è {{target_audience}}.\n\nConsidera le seguenti parole chiave o concetti: {{parole_chiave}}.\n\nPer ogni nome suggerito, fornisci una brevissima spiegazione del perché potrebbe funzionare.",
+    "translation_en": "Generate {{number_of_names}} creative and memorable names for a new {{business_type}} (e.g., software, consultancy, online store) in the {{sector}} sector. The target audience is {{target_audience}}.\n\nConsider the following keywords or concepts: {{keywords}}.\n\nFor each suggested name, provide a very brief explanation of why it might work.",
+    "tags": ["#brainstorming", "#naming", "#creativita", "#marketing", "#startup"],
+    "aiModel": "Claude 3 Opus",
+    "notes": "Aiuta a trovare nomi originali per nuovi progetti o aziende, specificando bene il contesto.",
+    "imageUrl": "https://images.unsplash.com/photo-1553775282-20af80779716?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+      "id": "lib-006",
+      "title": "Prompt: Risposta Reclamo Cliente",
+      "text": "Scrivi una bozza di risposta email a un cliente che si lamenta di {{problema_specifico}}. \nMostra empatia per la sua frustrazione, scusati sinceramente per l'inconveniente (se appropriato), spiega brevemente la causa (se possibile e opportuno) e proponi una soluzione chiara o i prossimi passi, come {{soluzione_proposta}}. \nMantieni un tono professionale e rassicurante.\n\nDettagli del cliente (opzionale): {{dettagli_cliente}}\nNumero ordine/riferimento (opzionale): {{numero_ordine}}",
+      "translation_en": "Draft an email response to a customer complaining about {{specific_problem}}.\nShow empathy for their frustration, sincerely apologize for the inconvenience (if appropriate), briefly explain the cause (if possible and appropriate), and propose a clear solution or next steps, such as {{proposed_solution}}.\nMaintain a professional and reassuring tone.\n\nCustomer details (optional): {{customer_details}}\nOrder/reference number (optional): {{order_number}}",
+      "tags": ["#servizio_clienti", "#email", "#reclamo", "#customer_care", "#problem_solving"],
+      "aiModel": "Claude 3 Sonnet",
+      "notes": "Aiuta a formulare risposte professionali ed empatiche ai reclami dei clienti.",
+      "imageUrl": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+  {
+      "id": "lib-007",
+      "title": "Modello: Analisi SWOT Semplificata2",
+      "text": "Conduci un'analisi SWOT (Strengths, Weaknesses, Opportunities, Threats) per {{soggetto_analisi}} (es. un'idea di business, un progetto specifico, un prodotto).\n\nConsidera i seguenti aspetti:\n- Punti di Forza Interni: {{punti_forza_input}}\n- Punti Deboli Interni: {{punti_deboli_input}}\n- Opportunità Esterne di Mercato: {{opportunita_input}}\n- Minacce Esterne di Mercato: {{minacce_input}}\n\nFornisci un elenco puntato per ciascuna delle 4 categorie (S, W, O, T) basandoti sugli input forniti e sul contesto generale di {{soggetto_analisi}}.",
+      "translation_en": "Conduct a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) for {{subject_of_analysis}} (e.g., a business idea, a specific project, a product).\n\nConsider the following aspects:\n- Internal Strengths: {{strengths_input}}\n- Internal Weaknesses: {{weaknesses_input}}\n- External Market Opportunities: {{opportunities_input}}\n- External Market Threats: {{threats_input}}\n\nProvide a bulleted list for each of the 4 categories (S, W, O, T) based on the provided inputs and the general context of {{subject_of_analysis}}.",
+      "tags": ["#analisi", "#strategia", "#swot", "#business", "#pianificazione"],
+      "aiModel": "ChatGPT-4o",
+      "notes": "Struttura un'analisi SWOT guidata. Utile per valutazioni strategiche rapide.",
+      "imageUrl": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  },
+    {
+      "id": "lib-008",
+      "title": "Prompt: Spiegazione Codice (per non tecnici)",
+      "text": "Spiega cosa fa il seguente blocco di codice in termini semplici, come se lo stessi spiegando a qualcuno che non ha conoscenze di programmazione. Evita il gergo tecnico il più possibile e usa analogie se utili.\n\nCodice da spiegare:\n```{{linguaggio_codice}}\n{{blocco_codice}}\n```\n\nSpiegazione Semplice:",
+      "translation_en": "Explain what the following block of code does in simple terms, as if you were explaining it to someone with no programming knowledge. Avoid technical jargon as much as possible and use analogies if helpful.\n\nCode to explain:\n```{{code_language}}\n{{code_block}}\n```\n\nSimple Explanation:",
+      "tags": ["#codice", "#spiegazione", "#semplificazione", "#comunicazione", "#tech"],
+      "aiModel": "Claude 3 Sonnet",
+      "notes": "Rende comprensibile il funzionamento di uno script o funzione a colleghi o clienti non tecnici.",
+      "imageUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max"
+  }
+]
