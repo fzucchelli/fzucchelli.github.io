@@ -61,7 +61,7 @@
   },
   {
       "id": "lib-007",
-      "title": "Modello: Analisi SWOT Semplificata2",
+      "title": "Modello: Analisi SWOT Semplificata",
       "text": "Conduci un'analisi SWOT (Strengths, Weaknesses, Opportunities, Threats) per {{soggetto_analisi}} (es. un'idea di business, un progetto specifico, un prodotto).\n\nConsidera i seguenti aspetti:\n- Punti di Forza Interni: {{punti_forza_input}}\n- Punti Deboli Interni: {{punti_deboli_input}}\n- Opportunità Esterne di Mercato: {{opportunita_input}}\n- Minacce Esterne di Mercato: {{minacce_input}}\n\nFornisci un elenco puntato per ciascuna delle 4 categorie (S, W, O, T) basandoti sugli input forniti e sul contesto generale di {{soggetto_analisi}}.",
       "translation_en": "Conduct a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) for {{subject_of_analysis}} (e.g., a business idea, a specific project, a product).\n\nConsider the following aspects:\n- Internal Strengths: {{strengths_input}}\n- Internal Weaknesses: {{weaknesses_input}}\n- External Market Opportunities: {{opportunities_input}}\n- External Market Threats: {{threats_input}}\n\nProvide a bulleted list for each of the 4 categories (S, W, O, T) based on the provided inputs and the general context of {{subject_of_analysis}}.",
       "tags": ["#analisi", "#strategia", "#swot", "#business", "#pianificazione"],

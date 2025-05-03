@@ -1,0 +1,165 @@
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0F1117; /* bg-dark */
+    color: #E2E5EF; /* text-gray-200 */
+    overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
+    overflow-x: hidden; /* Prevent minor horizontal overflows */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #1f2437; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+/* Component Styles */
+.bg-dark { background-color: #0F1117; }
+.bg-card { background-color: #1F2437; }
+.bg-sidebar { background-color: #131620; }
+.bg-input { background-color: #262B3D; }
+.border-border { border-color: #3A3F5E; }
+.text-primary { color: #6366F1; }
+.bg-primary { background-color: #6366F1; }
+.border-primary { border-color: #6366F1; }
+.ring-primary { --tw-ring-color: #6366F1; }
+.text-highlight { color: #FF9800; } /* Amber-500 */
+.bg-highlight { background-color: #FF9800; }
+
+.tag { /* Base tag style */
+    display: inline-block;
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    margin-right: 0.5rem; /* mr-2 */
+    margin-bottom: 0.25rem; /* mb-1 */
+    padding: 0.25rem 0.625rem; /* py-1 px-2.5 */
+    border-radius: 9999px; /* rounded-full */
+    border-width: 1px;
+    line-height: 1; /* Ensure consistent height */
+    white-space: nowrap;
+    cursor: default; /* Indicate it's not directly clickable */
+}
+
+/* Item Card Styles */
+.item-card {
+    position: relative;
+    background-color: #1F2437; border: 1px solid #3A3F5E;
+    border-radius: 0.5rem; padding: 1rem;
+    transition: all 0.2s ease-in-out; cursor: pointer;
+    display: flex; flex-direction: column;
+    overflow: hidden; /* Contain pseudo-elements */
+}
+.item-card:hover {
+    transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-color: #6366F1;
+}
+/* Optional Gradient Sweep on Hover */
+.item-card::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(90deg, transparent, #6366f160, transparent);
+    background-size: 200% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;
+    animation: sweep 2s linear infinite paused;
+}
+.item-card:hover::before { opacity: 1; animation-play-state: running; }
+@keyframes sweep { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Glass Card Effect */
+.glass-card {
+    background: rgba(31, 36, 55, 0.7); backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(58, 63, 94, 0.4);
+}
+
+[x-cloak] { display: none !important; }
+
+/* Tag Color Classes */
+.tag-color-0{background-color:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}.tag-color-1{background-color:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#6ee7b7}.tag-color-2{background-color:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.3);color:#fde047}.tag-color-3{background-color:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.3);color:#f9a8d4}.tag-color-4{background-color:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3);color:#d8b4fe}.tag-color-5{background-color:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5}.tag-color-6{background-color:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:#fdba74}.tag-color-7{background-color:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:#5eead4}.tag-color-8{background-color:rgba(107,114,128,0.1);border-color:rgba(107,114,128,0.3);color:#d1d5db}.tag-color-9{background-color:rgba(132,204,22,0.1);border-color:rgba(132,204,22,0.3);color:#bef264}
+
+/* Variable Insert Button */
+.insert-variable-btn {
+    background: none; border: none; color: #a0aec0; cursor: pointer;
+    font-size: 0.75rem; margin-left: 0.5rem; padding: 0.1rem 0.3rem;
+    border-radius: 0.25rem; transition: all 0.15s ease;
+}
+.insert-variable-btn:hover { background-color: #262B3D; color: #e2e5ef; }
+
+/* Mobile Sidebar Overlay */
+.sidebar-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 15; transition: opacity 0.3s ease-in-out; }
+
+/* Ensure inputs have visible text color */
+input[type="text"], input[type="url"], input[type="email"], input[type="password"], textarea, select {
+     color: #e2e5ef; /* text-gray-200 */
+     background-color: #262B3D; /* bg-input */
+     border: 1px solid #3A3F5E; /* border-border */
+}
+input::placeholder, textarea::placeholder {
+     color: #6b7280; /* text-gray-500 */
+     opacity: 1; /* Firefox */
+}
+/* Style for datalist dropdown */
+/* Basic styling for datalist dropdown appearance */
+datalist {
+    position: absolute;
+    background-color: #1F2437; /* bg-card */
+    border: 1px solid #3A3F5E; /* border-border */
+    border-radius: 0 0 0.375rem 0.375rem;
+    z-index: 50; /* Ensure it's above other elements */
+    max-height: 200px;
+    overflow-y: auto;
+    color: #e2e5ef; /* Text color for options */
+    display: none; /* Hide by default, browser handles showing */
+}
+
+/* Optional: Style the options inside the datalist (limited support) */
+datalist option {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+datalist option:hover {
+    background-color: #262B3D; /* bg-input */
+}
+
+/* Trigger display (mostly handled by browser, but can try forcing focus) */
+input[list]:focus + datalist {
+    /* display: block; */ /* Browser handles this better */
+}
+
+/* Onboarding Styles (Kept for potential future use, but disabled by default) */
+.onboarding-tooltip {
+    position: absolute; background-color: #262B3D; color: #e2e5ef;
+    padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid #4a5568;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 50; max-width: 300px;
+    font-size: 0.875rem; line-height: 1.4; opacity: 0; transform: translateY(10px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out; pointer-events: none; /* Disable interaction when hidden */
+}
+.onboarding-tooltip.active { opacity: 1; transform: translateY(0); pointer-events: auto; /* Enable interaction when active */ }
+.onboarding-tooltip::after { /* Simple arrow */
+    content: ''; position: absolute; border-width: 6px; border-style: solid;
+}
+.onboarding-tooltip.bottom::after { top: -12px; left: calc(50% - 6px); border-color: transparent transparent #262B3D transparent; }
+.onboarding-tooltip.top::after { bottom: -12px; left: calc(50% - 6px); border-color: #262B3D transparent transparent transparent; }
+.onboarding-tooltip.left::after { right: -12px; top: calc(50% - 6px); border-color: transparent transparent transparent #262B3D; }
+.onboarding-tooltip.right::after { left: -12px; top: calc(50% - 6px); border-color: transparent #262B3D transparent transparent; }
+
+.onboarding-tooltip-controls { margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.onboarding-tooltip-controls button { font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 0.375rem; background-color: #4a5568; color: white; border: none; cursor: pointer; }
+.onboarding-tooltip-controls button:hover { background-color: #6b7280; }
+.onboarding-tooltip-controls .skip-btn { background: none; color: #9ca3af; }
+.onboarding-tooltip-controls .skip-btn:hover { color: white; }
+
+/* Pulse animation for onboarding highlight */
+.onboarding-highlight {
+    position: absolute; /* Needed for positioning */
+    pointer-events: none; /* Prevent interaction */
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+    animation: pulse-indigo 2s infinite;
+    border-radius: 0.375rem; /* rounded-md */
+    border: 2px solid #6366F1; /* Ensure visibility */
+    z-index: 49; /* Below tooltip */
+}
+@keyframes pulse-indigo { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }

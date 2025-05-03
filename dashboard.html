@@ -345,7 +345,61 @@
                              </div>
 
                              <!-- Onboarding Tooltips -->
-                            
+                             <div x-show="showOnboarding">
+                                 <!-- Invisible placeholder text for baseline layout -->
+                                 <div class="invisible">
+                                     <i class="fa fa-folder-open text-4xl text-gray-500 mb-4"></i>
+                                     <h2 class="text-xl font-semibold text-white mb-2">Nessun Elemento Creato</h2>
+                                     <p class="text-gray-400 mb-5 max-w-md mx-auto">Inizia salvando i tuoi prompt o creando modelli riutilizzabili.</p>
+                                 </div>
+
+                                 <!-- Step 1: Welcome -->
+                                 <div class="onboarding-tooltip top" :class="{'active': onboardingStep === 1}" style="top: 15%; left: 50%; transform: translateX(-50%);">
+                                     <strong class="text-primary">Benvenuto in Prompt Maestro!</strong><br>
+                                     Questo è il tuo spazio ('I Miei Elementi') dove salverai e gestirai i tuoi prompt e modelli per l'IA.
+                                     <div class="onboarding-tooltip-controls">
+                                         <button @click="skipOnboarding()" class="skip-btn">Salta</button>
+                                         <button @click="onboardingStep = 2">Avanti &rarr;</button>
+                                     </div>
+                                 </div>
+                                 <!-- Step 2: Explain Elements -->
+                                 <div class="onboarding-tooltip bottom" :class="{'active': onboardingStep === 2}" style="bottom: 45%; left: 50%; transform: translateX(-50%);">
+                                     Un <strong>Prompt</strong> è testo fisso. Un <strong>Modello</strong> usa <code class="text-highlight font-mono bg-input px-1 rounded text-xs">{{variabili}}</code> (es. <code class="text-highlight font-mono bg-input px-1 rounded text-xs">{{cliente}}</code>) per essere riutilizzabile!
+                                      <div class="onboarding-tooltip-controls">
+                                         <button @click="skipOnboarding()" class="skip-btn">Salta</button>
+                                         <button @click="onboardingStep = 3">Avanti &rarr;</button>
+                                     </div>
+                                 </div>
+                                 <!-- Step 3: Create Button -->
+                                 <div class="onboarding-tooltip top" :class="{'active': onboardingStep === 3}" style="top: 65%; left: 35%; transform: translateX(-50%);">
+                                     <strong class="text-primary">Inizia da qui!</strong><br>
+                                     Clicca per aggiungere il tuo primo prompt o modello.
+                                      <div class="onboarding-tooltip-controls">
+                                         <button @click="skipOnboarding()" class="skip-btn">Salta</button>
+                                         <button @click="onboardingStep = 4">Avanti &rarr;</button>
+                                     </div>
+                                 </div>
+                                <!-- Step 4: Library Link -->
+                                 <div class="onboarding-tooltip top" :class="{'active': onboardingStep === 4}" style="top: 70%; left: 68%; transform: translateX(-50%);">
+                                    <strong class="text-primary">Non sai da dove iniziare?</strong><br>
+                                     La <strong>Libreria</strong> (vedi menu a sinistra) contiene esempi già pronti da copiare!
+                                      <div class="onboarding-tooltip-controls">
+                                         <button @click="skipOnboarding()" class="skip-btn">Salta</button>
+                                         <button @click="onboardingStep = 5">Avanti &rarr;</button>
+                                     </div>
+                                 </div>
+                                 <!-- Step 5: Projects -->
+                                 <div class="onboarding-tooltip right" :class="{'active': onboardingStep === 5}" style="top: 30%; left: -30px; transform: translateX(-100%); width: 250px;">
+                                     Organizza i tuoi elementi in <strong>Progetti</strong> (nel menu a sinistra) per tenerli ordinati.
+                                      <div class="onboarding-tooltip-controls">
+                                         <button @click="skipOnboarding()">Fine</button>
+                                     </div>
+                                 </div>
+                                 <!-- Onboarding Highlight Targets -->
+                                 <div x-show="onboardingStep === 3" class="absolute left-1/2 bottom-[115px] -translate-x-[100px] w-[220px] h-[40px] border-2 border-primary onboarding-highlight pointer-events-none"></div>
+                                 <div x-show="onboardingStep === 4" class="absolute left-1/2 bottom-[65px] translate-x-[10px] w-[200px] h-[30px] border border-primary onboarding-highlight pointer-events-none"></div>
+                                 <!-- Add sidebar target highlight if needed, e.g., using JS to find element by ID and position -->
+                             </div>
                          </div>
 
                          <!-- Element List -->
