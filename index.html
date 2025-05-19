@@ -1,470 +1,392 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Maestro | Gestisci i tuoi prompt AI con maestria</title>
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Maestro - Rivoluziona i Tuoi Prompt AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #E2E8F0; scroll-behavior: smooth; } /* Darker Slate Blue BG, Lighter Text */
+.hero-gradient { background: linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #0F172A 100%); } /* Updated gradient */
 
-    <style>
-        :root {
-            --color-primary: #8b5cf6; /* purple-500 */
-            --color-primary-light: #a78bfa; /* purple-400 */
-            --color-secondary: #6366f1; /* indigo-500 */
-            --color-dark: #111827; /* gray-900 */
-            --color-darker: #0f172a; /* slate-900 */
-            --color-card: rgba(31, 41, 55, 0.6); /* gray-800 with alpha */
-            --color-border: rgba(75, 85, 99, 0.3); /* gray-600 with alpha */
-            --color-text-main: #e5e7eb; /* gray-200 */
-            --color-text-muted: #9ca3af; /* gray-400 */
-        }
+.ph-button-primary {
+    background-color: #7C3AED; /* Vibrant Purple */
+    color: white;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(124,58,237,0.3);
+}
+.ph-button-primary:hover {
+    background-color: #6D28D9; /* Darker Purple */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 2px 6px rgba(124,58,237,0.4);
+}
+.ph-button-secondary {
+    background-color: #334155; /* Darker Slate */
+    color: #E2E8F0; /* Lighter text */
+    border: 1px solid #475569; /* Slate border */
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.ph-button-secondary:hover {
+    background-color: #475569;
+    border-color: #64748B;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.interactive-prompt-card {
+    background-color: #1E293B; /* Slate Card BG */
+    border: 1px solid #334155;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25), 0 20px 40px -10px rgba(0,0,0,0.35);
+    border-radius: 0.75rem; /* More rounded */
+}
+.variable-input {
+    background-color: #0F172A; /* Darkest Slate */
+    border: 1px solid #334155;
+    color: #E2E8F0;
+    padding: 0.65rem 0.85rem; /* Slightly more padding */
+    border-radius: 0.5rem; /* More rounded */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.variable-input:focus {
+    border-color: #7C3AED;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+}
+.prompt-placeholder { color: #A78BFA; font-weight: 600; } /* Brighter Purple for placeholders */
+.section-title { color: #F8FAFC; font-weight: 800;} /* Almost White, bolder */
+.feature-icon { color: #7C3AED; }
+.benefit-card {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.75rem; /* More rounded */
+}
+.benefit-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(124, 58, 237, 0.15), 0 3px 8px rgba(0,0,0,0.1);
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--color-dark);
-            color: var(--color-text-main);
-            overflow-x: hidden; /* Prevent horizontal scroll from blurry circles */
+ @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ @keyframes fadeInUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+ .animate-fadeIn { animation: fadeIn 1s ease-out forwards; }
+ .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+ .delay-200 { animation-delay: 0.2s; }
+ .delay-400 { animation-delay: 0.4s; }
+ .delay-600 { animation-delay: 0.6s; }
+ .delay-800 { animation-delay: 0.8s; } /* New delay */
+</style>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brandPurple: { DEFAULT: '#7C3AED', light: '#A78BFA', dark: '#6D28D9' },
+          accentTeal: { DEFAULT: '#14B8A6', light: '#2DD4BF', dark: '#0D9488' },
+          darkBg: { DEFAULT: '#0F172A', card: '#1E293B', uiElement: '#334155' },
+          lightText: { DEFAULT: '#E2E8F0', subtle: '#94A3B8', display: '#F8FAFC' } // Slate-based text
+        },
+        borderRadius: {
+            'xl': '0.75rem',
+            '2xl': '1rem',
         }
-
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .card {
-            background-color: var(--color-card);
-            border: 1px solid var(--color-border);
-            border-radius: 0.75rem; /* rounded-xl */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.4);
-        }
-
-        .feature-icon {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15));
-            border-radius: 50%;
-            padding: 1rem;
-            width: 64px; /* w-16 */
-            height: 64px; /* h-16 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.875rem; /* text-3xl */
-            color: var(--color-primary-light);
-            margin-bottom: 1rem; /* mb-4 */
-            flex-shrink: 0;
-        }
-
-        .btn {
-            display: inline-block;
-            border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.75rem 1.75rem; /* py-3 px-7 */
-            font-weight: 600; /* font-semibold */
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(139, 92, 246, 0.3);
-        }
-
-        .btn-outline {
-            border: 2px solid var(--color-text-main);
-            color: var(--color-text-main);
-        }
-
-        .btn-outline:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: var(--color-primary-light);
-            color: var(--color-primary-light);
-            transform: translateY(-2px);
-        }
-
-        .section {
-            padding-top: 6rem; /* pt-24 */
-            padding-bottom: 6rem; /* pb-24 */
-        }
-        .section-header {
-             padding-top: 8rem; /* pt-32 - more padding for first section below fixed header */
-             padding-bottom: 6rem; /* pb-24 */
-        }
-
-        @media (max-width: 768px) {
-            .section, .section-header {
-                padding-top: 4rem; /* pt-16 */
-                padding-bottom: 4rem; /* pb-16 */
-            }
-            .section-header {
-                 padding-top: 6rem; /* pt-24 */
-            }
-        }
-
-        /* Animation */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Blurry background shapes */
-        .blur-circle-1 {
-            position: absolute;
-            top: -50px;
-            right: -100px;
-            width: 400px;
-            height: 400px;
-            background-image: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-        }
-        .blur-circle-2 {
-            position: absolute;
-            bottom: -100px;
-            left: -150px;
-            width: 500px;
-            height: 500px;
-            background-image: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
-            border-radius: 50%;
-             z-index: -1;
-        }
-
-        [x-cloak] { display: none !important; }
-    </style>
+      }
+    }
+  }
+</script>
 </head>
+<body class="antialiased">
 
-<body class="min-h-screen relative" x-data="{ mobileMenuOpen: false }">
+<!-- Header -->
+<header class="py-4 px-6 md:px-10 sticky top-0 z-50 bg-darkBg-card/90 backdrop-blur-lg border-b border-darkBg-uiElement/70">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="flex items-center space-x-2.5 group">
+            <div class="bg-gradient-to-br from-brandPurple-light to-brandPurple p-2.5 rounded-lg shadow-lg group-hover:shadow-brandPurple/50 transition-shadow duration-300">
+                <i class="fas fa-brain text-xl text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-lightText-display group-hover:text-brandPurple-light transition-colors">Prompt Maestro</h1>
+        </a>
+        <nav class="hidden md:flex items-center space-x-5">
+            <a href="#features" class="text-lightText-subtle hover:text-white transition-colors text-sm font-medium">Funzionalità</a>
+            <a href="#how-it-works" class="text-lightText-subtle hover:text-white transition-colors text-sm font-medium">Come Funziona</a>
+            <a href="#pricing" class="text-lightText-subtle hover:text-white transition-colors text-sm font-medium">Prezzi</a>
+            <a href="/dashboard2.html" class="ph-button-secondary text-sm py-2 px-4 rounded-md font-medium">Accedi</a>
+            <a href="/dashboard2.html" class="ph-button-primary text-sm py-2.5 px-5 rounded-md font-semibold">Prova Gratis</a>
+        </nav>
+        <div class="md:hidden">
+            <button id="mobileMenuButton" class="text-lightText-display focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </div>
+</header>
+<!-- Mobile Menu (hidden by default) -->
+<div id="mobileMenu" class="hidden md:hidden fixed inset-0 bg-darkBg-card/95 backdrop-blur-md z-40 pt-20 p-6 space-y-4">
+    <a href="#features" class="block text-lightText-subtle hover:text-white transition-colors text-lg py-2 mobile-menu-link">Funzionalità</a>
+    <a href="#how-it-works" class="block text-lightText-subtle hover:text-white transition-colors text-lg py-2 mobile-menu-link">Come Funziona</a>
+    <a href="#pricing" class="block text-lightText-subtle hover:text-white transition-colors text-lg py-2 mobile-menu-link">Prezzi</a>
+    <hr class="border-darkBg-uiElement/50 my-3">
+    <a href="/dashboard2.html" class="block ph-button-secondary w-full text-center text-md py-2.5 px-4 rounded-md font-medium">Accedi</a>
+    <a href="/dashboard2.html" class="block ph-button-primary w-full text-center text-md py-3 px-5 rounded-md font-semibold mt-3">Prova Gratis</a>
+</div>
 
-    <!-- Background Shapes -->
-    <div class="blur-circle-1"></div>
-    <div class="blur-circle-2"></div>
 
-    <!-- Header -->
-    <header class="fixed w-full top-0 z-50 bg-gray-900/80 backdrop-filter backdrop-blur-lg border-b border-gray-700/50"
-            @click.away="mobileMenuOpen = false">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <a href="#" class="flex items-center space-x-2 shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M9 13a4.5 4.5 0 0 0 3-4"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M12 13h4"></path><path d="M12 18h6a2 2 0 0 1 2 2v1"></path><path d="M12 8h8"></path><path d="M16 8V5a2 2 0 0 1 2-2"></path><circle cx="16" cy="13" r=".5"></circle><circle cx="18" cy="3" r=".5"></circle><circle cx="20" cy="21" r=".5"></circle><circle cx="20" cy="8" r=".5"></circle>
-                    </svg>
-                    <span class="text-xl font-bold text-white">PROMPT MAESTRO</span>
-                </a>
+<!-- Hero Section -->
+<section class="hero-gradient py-20 md:py-32 text-center overflow-hidden">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-6xl font-extrabold text-lightText-display mb-6 animate-fadeInUp leading-tight">
+            Smetti di Lottare con i Prompt AI. <br class="hidden md:block"> <span class="bg-clip-text text-transparent bg-gradient-to-r from-brandPurple-light to-accentTeal-light">Inizia a Dominarli Davvero.</span>
+        </h2>
+        <p class="text-lg md:text-xl text-lightText-subtle mb-10 max-w-3xl mx-auto animate-fadeInUp delay-200">
+            Prompt Maestro è la tua suite definitiva per creare, organizzare e riutilizzare prompt AI ad alte prestazioni.
+            Sfrutta modelli intelligenti con variabili dinamiche. Provalo e senti la differenza.
+        </p>
 
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                    <a href="#features" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Funzionalità</a>
-                    <a href="#libreria-preview" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Libreria</a>
-                    <!-- <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Prezzi</a> -->
-                    <a href="#contact" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Contatti</a>
-                    <a href="dashboard.html" class="btn btn-primary text-sm px-5 py-2">Accedi all'App</a>
-                </nav>
+        <div id="magicPromptCustomizer" class="interactive-prompt-card max-w-3xl mx-auto p-6 md:p-8 rounded-xl shadow-2xl animate-fadeInUp delay-400">
+            <div class="flex items-center mb-5">
+                <i class="fas fa-magic-wand-sparkles text-accentTeal-light text-2xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-lightText-display">Prova un Modello Interattivo:</h3>
+            </div>
+            <div id="basePromptTemplate" class="text-left text-lightText-subtle mb-6 p-5 bg-darkBg-uiElement/50 rounded-lg text-sm leading-relaxed whitespace-pre-wrap border border-darkBg-uiElement/70 shadow-inner">
+                Crea un post coinvolgente per <span class="prompt-placeholder">[piattaforma]</span> sull'argomento <span class="prompt-placeholder">[argomento_post]</span>.
+                Il target audience è <span class="prompt-placeholder">[target_audience]</span> e il tono desiderato è <span class="prompt-placeholder">[tono_post]</span>.
+                Includi una call to action chiara: <span class="prompt-placeholder">[call_to_action]</span>. Lunghezza massima: <span class="prompt-placeholder">[lunghezza_max]</span> caratteri.
+            </div>
 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden text-gray-300 hover:text-white focus:outline-none" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Apri menu">
-                    <i class="fas" :class="{ 'fa-bars': !mobileMenuOpen, 'fa-times': mobileMenuOpen }" class="text-xl"></i>
-                </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4 mb-6">
+                <div> <label for="var_piattaforma" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Piattaforma Social</label> <input type="text" id="var_piattaforma" data-variable="piattaforma" class="variable-input w-full" placeholder="Es. LinkedIn, Instagram"> </div>
+                <div> <label for="var_argomento_post" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Argomento del Post</label> <input type="text" id="var_argomento_post" data-variable="argomento_post" class="variable-input w-full" placeholder="Es. Futuro del Lavoro Remoto"> </div>
+                <div> <label for="var_target_audience" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Target Audience</label> <input type="text" id="var_target_audience" data-variable="target_audience" class="variable-input w-full" placeholder="Es. HR Managers, Freelancers"> </div>
+                <div> <label for="var_tono_post" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Tono del Post</label> <input type="text" id="var_tono_post" data-variable="tono_post" class="variable-input w-full" placeholder="Es. Professionale ma accessibile"> </div>
+                <div> <label for="var_call_to_action" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Call to Action</label> <input type="text" id="var_call_to_action" data-variable="call_to_action" class="variable-input w-full" placeholder="Es. Leggi il nostro report completo"> </div>
+                <div> <label for="var_lunghezza_max" class="block text-xs font-medium text-lightText-subtle mb-1.5 text-left">Lunghezza Massima</label> <input type="text" id="var_lunghezza_max" data-variable="lunghezza_max" class="variable-input w-full" placeholder="Es. 280 (per Twitter)"> </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                <button id="copyInteractivePrompt" class="ph-button-secondary py-3 px-6 rounded-lg text-sm font-medium flex-1"> <i class="fas fa-copy mr-2.5"></i> Copia Prompt Generato </button>
+                 <a href="/dashboard2.html" class="ph-button-primary py-3 px-6 rounded-lg text-sm font-semibold flex-1"> <i class="fas fa-rocket mr-2.5"></i> Prova l'App Completa </a>
             </div>
         </div>
+        <p class="text-xs text-lightText-subtle mt-6 animate-fadeInUp delay-600">Nessuna registrazione richiesta per provare questa demo interattiva!</p>
+    </div>
+</section>
 
-        <!-- Mobile Navigation -->
-        <div class="md:hidden absolute top-16 left-0 w-full bg-gray-800 border-t border-gray-700" x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" x-cloak>
-            <nav class="px-4 py-4 flex flex-col space-y-3">
-                <a href="#features" class="block text-gray-300 hover:text-white transition-colors" @click="mobileMenuOpen = false">Funzionalità</a>
-                <a href="#libreria-preview" class="block text-gray-300 hover:text-white transition-colors" @click="mobileMenuOpen = false">Libreria</a>
-                <!-- <a href="#pricing" class="block text-gray-300 hover:text-white transition-colors" @click="mobileMenuOpen = false">Prezzi</a> -->
-                <a href="#contact" class="block text-gray-300 hover:text-white transition-colors" @click="mobileMenuOpen = false">Contatti</a>
-                <a href="dashboard.html" class="btn btn-primary mt-2">Accedi all'App</a>
-            </nav>
+<section id="features" class="py-16 md:py-24 bg-darkBg-DEFAULT">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12 md:mb-20">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 animate-fadeInUp">Stanco del Caos dei Prompt? <span class="text-brandPurple-light">Noi Abbiamo la Soluzione.</span></h2>
+            <p class="text-lg text-lightText-subtle max-w-2xl mx-auto animate-fadeInUp delay-200">Prompt Maestro porta ordine, potenza e collaborazione nella gestione dei tuoi prompt e modelli AI, trasformando il tuo flusso di lavoro.</p>
         </div>
-    </header>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="benefit-card p-8 rounded-xl text-center animate-fadeInUp delay-200"> <div class="feature-icon text-4xl mb-5 inline-block p-3 bg-darkBg-uiElement/30 rounded-full"><i class="fas fa-layer-group"></i></div> <h3 class="text-xl font-semibold text-lightText-display mb-3">Modelli Riusabili Intelligenti</h3> <p class="text-lightText-subtle text-sm leading-relaxed">Definisci una volta con variabili dinamiche (es. `[cliente]`, `[prodotto]`), usa all'infinito. Massima efficienza e coerenza per i tuoi output AI.</p> </div>
+            <div class="benefit-card p-8 rounded-xl text-center animate-fadeInUp delay-400"> <div class="feature-icon text-4xl mb-5 inline-block p-3 bg-darkBg-uiElement/30 rounded-full"><i class="fas fa-pencil-ruler"></i></div> <h3 class="text-xl font-semibold text-lightText-display mb-3">Creazione Intuitiva e Guidata</h3> <p class="text-lightText-subtle text-sm leading-relaxed">Interfaccia drag-and-drop (prossimamente!) e testuale semplice per definire prompt e modelli. Anteprime live e suggerimenti per variabili efficaci.</p> </div>
+            <div class="benefit-card p-8 rounded-xl text-center animate-fadeInUp delay-600"> <div class="feature-icon text-4xl mb-5 inline-block p-3 bg-darkBg-uiElement/30 rounded-full"><i class="fas fa-folder-tree"></i></div> <h3 class="text-xl font-semibold text-lightText-display mb-3">Organizzazione Chiara e Flessibile</h3> <p class="text-lightText-subtle text-sm leading-relaxed">Categorizza, tagga e ricerca facilmente i tuoi prompt e modelli. Librerie personali e di team (prossimamente!) per una collaborazione ottimale.</p> </div>
+        </div>
+    </div>
+</section>
 
-    <!-- Hero Section -->
-    <section class="section-header relative overflow-hidden">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row items-center gap-12">
-                <!-- Text Content -->
-                <div class="w-full lg:w-1/2 text-center lg:text-left fade-in" style="animation-delay: 0.1s;">
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                        Gestisci i tuoi prompt AI con <span class="text-gradient">maestria</span>
-                    </h1>
-                    <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-xl mx-auto lg:mx-0">
-                        Organizza, personalizza e ottimizza i tuoi prompt per l'intelligenza artificiale.
-                        Risparmia tempo e migliora la qualità dei risultati. Fatto per le PMI e i professionisti italiani.
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
-                        <a href="dashboard.html" class="btn btn-primary">Prova Ora (Free Beta)</a>
-                        <a href="#features" class="btn btn-outline">Scopri di più</a>
-                    </div>
-
-                    <div class="mt-10 flex items-center justify-center lg:justify-start space-x-2 text-sm text-gray-400">
-                        <span>Fatto in Italia</span>
-                        <svg viewBox="0 0 300 200" width="20" xmlns="http://www.w3.org/2000/svg"><path fill="#009246" d="M0 0h100v200H0z"/><path fill="#fff" d="M100 0h100v200H100z"/><path fill="#ce2b37" d="M200 0h100v200H200z"/></svg>
-                    </div>
+<section id="how-it-works" class="py-16 md:py-24 bg-darkBg-card">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12 md:mb-20">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 animate-fadeInUp">Semplice. Potente. Veloce.</h2>
+            <p class="text-lg text-lightText-subtle max-w-xl mx-auto animate-fadeInUp delay-200">Inizia a usare Prompt Maestro in tre semplici passaggi e rivoluziona il tuo workflow AI:</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-x-8 gap-y-12 md:gap-x-12 text-center">
+            <div class="animate-fadeInUp delay-200">
+                <div class="bg-gradient-to-br from-brandPurple to-accentTeal-dark text-white w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-brandPurple/30">
+                    <i class="fas fa-plus-circle"></i>
                 </div>
-
-                <!-- Illustration/Screenshot -->
-                <div class="w-full lg:w-1/2 lg:pl-8 fade-in" style="animation-delay: 0.3s;">
-                    <div class="relative">
-                        <div class="card p-4 sm:p-6 rounded-lg shadow-xl border border-indigo-500/30">
-                            <!-- Simplified App UI Representation -->
-                             <div class="flex h-[300px] sm:h-[350px]">
-                                <!-- Sidebar -->
-                                <div class="w-1/4 bg-gray-900/50 rounded-l-lg border-r border-gray-700/50 p-3 space-y-3 overflow-hidden">
-                                     <div class="h-5 w-24 bg-gradient-primary rounded opacity-80"></div>
-                                     <div class="h-3 w-16 bg-gray-600 rounded"></div>
-                                     <div class="h-3 w-20 bg-gray-700 rounded"></div>
-                                     <div class="h-3 w-14 bg-gray-700 rounded"></div>
-                                     <div class="h-3 w-20 bg-gray-700 rounded"></div>
-                                     <div class="mt-4 h-2 w-16 bg-gray-600/50 rounded"></div>
-                                     <div class="h-3 w-16 bg-gray-700 rounded"></div>
-                                     <div class="h-3 w-12 bg-gray-700 rounded"></div>
-                                 </div>
-                                 <!-- Main Content -->
-                                 <div class="w-3/4 p-3 space-y-4">
-                                     <div class="h-8 bg-gray-700/70 rounded flex items-center px-2">
-                                         <span class="text-xs text-gray-300 font-medium">Email Marketing per Nuovi Clienti</span>
-                                     </div>
-                                     <div class="grid grid-cols-2 gap-3">
-                                         <div class="bg-gray-800/80 p-2 rounded-md border border-gray-700/50 space-y-2">
-                                             <div class="h-3 w-full bg-indigo-500/50 rounded"></div>
-                                             <div class="h-2 w-5/6 bg-gray-600 rounded"></div>
-                                             <div class="h-2 w-full bg-gray-600 rounded"></div>
-                                             <div class="flex gap-1 mt-1">
-                                                <span class="h-3 w-8 bg-blue-500/30 rounded-full"></span>
-                                                <span class="h-3 w-10 bg-green-500/30 rounded-full"></span>
-                                             </div>
-                                         </div>
-                                         <div class="bg-gray-800/80 p-2 rounded-md border border-gray-700/50 space-y-2">
-                                              <div class="h-3 w-4/5 bg-indigo-500/50 rounded"></div>
-                                             <div class="h-2 w-full bg-gray-600 rounded"></div>
-                                             <div class="h-2 w-4/6 bg-gray-600 rounded"></div>
-                                               <div class="flex gap-1 mt-1">
-                                                <span class="h-3 w-12 bg-yellow-500/30 rounded-full"></span>
-                                             </div>
-                                         </div>
-                                          <div class="bg-gray-800/80 p-2 rounded-md border border-gray-700/50 space-y-2 col-span-2">
-                                              <div class="h-3 w-3/5 bg-indigo-500/50 rounded"></div>
-                                             <div class="h-2 w-full bg-gray-600 rounded"></div>
-                                             <div class="h-2 w-5/6 bg-gray-600 rounded"></div>
-                                             <div class="h-2 w-4/6 bg-gray-600 rounded"></div>
-                                               <div class="flex gap-1 mt-1">
-                                                <span class="h-3 w-10 bg-pink-500/30 rounded-full"></span>
-                                                <span class="h-3 w-8 bg-gray-500/30 rounded-full"></span>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 </div>
-                            </div>
-                         </div>
-                         <!-- Floating elements example -->
-                         <div class="absolute -top-5 -right-5 bg-gradient-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-6">
-                           Modello AI
-                         </div>
-                         <div class="absolute -bottom-5 -left-5 bg-gray-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform -rotate-6 flex items-center gap-1">
-                           #email <i class="fas fa-tag text-[10px]"></i>
-                         </div>
-                    </div>
+                <h3 class="text-xl font-semibold text-lightText-display mb-2">1. Crea o Importa</h3>
+                <p class="text-lightText-subtle text-base">Scegli tra un prompt semplice, un modello riusabile con variabili, o importa i tuoi prompt esistenti. Sfrutta la nostra libreria di template pronti all'uso.</p>
+            </div>
+            <div class="animate-fadeInUp delay-400">
+                <div class="bg-gradient-to-br from-brandPurple to-accentTeal-dark text-white w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-brandPurple/30">
+                    <i class="fas fa-cogs"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-lightText-display mb-2">2. Personalizza e Organizza</h3>
+                <p class="text-lightText-subtle text-base">Definisci variabili, aggiungi descrizioni, tag e categorie. Imposta il modello AI preferito e fornisci note contestuali per ogni elemento.</p>
+            </div>
+            <div class="animate-fadeInUp delay-600">
+                <div class="bg-gradient-to-br from-brandPurple to-accentTeal-dark text-white w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-brandPurple/30">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-lightText-display mb-2">3. Utilizza e Itera</h3>
+                <p class="text-lightText-subtle text-base">Compila le variabili dei modelli con un click, copia il testo finale e incollalo nel tuo tool AI preferito. Traccia l'utilizzo e affina i tuoi prompt nel tempo.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Features Section -->
-    <section id="features" class="section">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Un'unica piattaforma per i tuoi prompt</h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">Prompt Maestro semplifica la gestione dei prompt per l'intelligenza artificiale, rendendo più efficiente il tuo flusso di lavoro.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Feature 1: Unified Elements -->
-                <div class="card p-6 text-center fade-in" style="animation-delay: 0.1s;">
-                    <div class="feature-icon mx-auto">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Elementi Unificati</h3>
-                    <p class="text-gray-400 text-sm">Gestisci prompt semplici e modelli riutilizzabili (`{{variabili}}`) in un unico posto, con rilevamento automatico.</p>
-                </div>
-
-                <!-- Feature 2: Organization -->
-                <div class="card p-6 text-center fade-in" style="animation-delay: 0.2s;">
-                    <div class="feature-icon mx-auto">
-                        <i class="fas fa-folder-tree"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Organizzazione Flessibile</h3>
-                    <p class="text-gray-400 text-sm">Usa Progetti (con colori!) e Tags (#marketing, #bozza) per categorizzare e ritrovare facilmente i tuoi elementi.</p>
-                </div>
-
-                <!-- Feature 3: Quick Use Modal -->
-                <div class="card p-6 text-center fade-in" style="animation-delay: 0.3s;">
-                    <div class="feature-icon mx-auto">
-                        <i class="fas fa-bolt-lightning"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Utilizzo Rapido</h3>
-                    <p class="text-gray-400 text-sm">Visualizza, compila variabili nei modelli e copia il testo finale con un click, tutto da una comoda modal.</p>
-                </div>
-
-                <!-- Feature 4: Library -->
-                <div class="card p-6 text-center fade-in" style="animation-delay: 0.4s;">
-                    <div class="feature-icon mx-auto">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Libreria Pronta</h3>
-                    <p class="text-gray-400 text-sm">Esplora prompt e modelli di alta qualità pronti all'uso, curati per le esigenze delle PMI italiane, e aggiungili al tuo spazio.</p>
-                </div>
-            </div>
+<section id="pricing" class="py-16 md:py-24 bg-darkBg-DEFAULT text-center">
+    <div class="container mx-auto px-6">
+        <h2 class="section-title text-3xl md:text-4xl mb-6 animate-fadeInUp">Pronto a Trasformare il Tuo Flusso di Lavoro AI?</h2>
+        <p class="text-lg text-lightText-subtle mb-12 max-w-xl mx-auto animate-fadeInUp delay-200">
+            Unisciti agli innovatori che stanno già risparmiando ore di lavoro e migliorando esponenzialmente la qualità dei loro output AI con Prompt Maestro.
+        </p>
+        <div class="animate-fadeInUp delay-400">
+            <a href="/dashboard2.html" class="ph-button-primary text-lg py-3.5 px-10 rounded-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200">
+                Inizia la Tua Prova Gratuita Ora
+                <i class="fas fa-arrow-right ml-2.5"></i>
+            </a>
         </div>
-    </section>
+        <p class="text-sm text-lightText-subtle mt-6 animate-fadeInUp delay-600">Piano gratuito disponibile. Nessuna carta di credito richiesta per iniziare.</p>
+    </div>
+</section>
 
-    <!-- Libreria Preview Section -->
-     <section id="libreria-preview" class="section bg-gray-900/50">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Parti subito con la <span class="text-gradient">Libreria</span></h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">Non iniziare da zero. Sfoglia la nostra collezione curata di prompt e modelli efficaci per task comuni.</p>
+<footer class="py-10 bg-darkBg-card border-t border-darkBg-uiElement/70">
+    <div class="container mx-auto px-6 text-center">
+        <div class="flex justify-center items-center space-x-3 mb-4">
+            <div class="bg-gradient-to-br from-brandPurple-light to-brandPurple p-2 rounded-md">
+                <i class="fas fa-brain text-md text-white"></i>
             </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Sample Library Card 1 -->
-                 <div class="card p-5 flex flex-col h-full fade-in" style="animation-delay: 0.1s;">
-                     <div class="flex justify-between items-start mb-2">
-                         <h4 class="font-semibold text-white text-base">Generatore Idee Blog Post</h4>
-                         <span class="text-xs bg-highlight/20 text-highlight border border-highlight/30 px-1.5 py-0.5 rounded-full flex-shrink-0 ml-2"><i class="fa fa-cogs mr-1"></i>Modello</span>
-                     </div>
-                    <p class="text-gray-400 text-xs mb-3 line-clamp-3 flex-grow">Genera 5 idee creative e SEO-friendly per un blog post sul tema principale "{{argomento_principale}}" rivolto a un pubblico di {{tipo_pubblico}}...</p>
-                    <div class="text-xs text-gray-500 mb-3">
-                        <i class="fa fa-robot mr-1"></i> ChatGPT-4o
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-4">
-                         <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded-full border border-blue-700/50">#blogging</span>
-                         <span class="text-xs bg-green-900/50 text-green-300 px-2 py-0.5 rounded-full border border-green-700/50">#contenuti</span>
-                         <span class="text-xs bg-purple-900/50 text-purple-300 px-2 py-0.5 rounded-full border border-purple-700/50">#seo</span>
-                    </div>
-                     <a href="dashboard.html" class="mt-auto btn btn-outline btn-sm text-xs w-full">Aggiungi ai Miei Elementi <i class="fas fa-plus ml-1"></i></a>
-                 </div>
-
-                 <!-- Sample Library Card 2 -->
-                  <div class="card p-5 flex flex-col h-full fade-in" style="animation-delay: 0.2s;">
-                     <div class="flex justify-between items-start mb-2">
-                         <h4 class="font-semibold text-white text-base">Analisi Sentimento Testo</h4>
-                          <span class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded-full flex-shrink-0 ml-2"><i class="fa fa-file-alt mr-1"></i>Prompt</span>
-                     </div>
-                    <p class="text-gray-400 text-xs mb-3 line-clamp-3 flex-grow">Analizza il sentimento (positivo, negativo, neutro) del seguente testo e fornisci una breve giustificazione... [INCOLLA QUI IL TESTO]</p>
-                    <div class="text-xs text-gray-500 mb-3">
-                        <i class="fa fa-robot mr-1"></i> Qualsiasi Modello
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-4">
-                         <span class="text-xs bg-yellow-900/50 text-yellow-300 px-2 py-0.5 rounded-full border border-yellow-700/50">#analisi</span>
-                         <span class="text-xs bg-red-900/50 text-red-300 px-2 py-0.5 rounded-full border border-red-700/50">#sentiment</span>
-                          <span class="text-xs bg-gray-700/50 text-gray-300 px-2 py-0.5 rounded-full border border-gray-600/50">#feedback</span>
-                    </div>
-                     <a href="dashboard.html" class="mt-auto btn btn-outline btn-sm text-xs w-full">Aggiungi ai Miei Elementi <i class="fas fa-plus ml-1"></i></a>
-                 </div>
-
-                 <!-- Sample Library Card 3 -->
-                 <div class="card p-5 flex flex-col h-full fade-in" style="animation-delay: 0.3s;">
-                     <div class="flex justify-between items-start mb-2">
-                         <h4 class="font-semibold text-white text-base">Email Follow-up Meeting</h4>
-                          <span class="text-xs bg-highlight/20 text-highlight border border-highlight/30 px-1.5 py-0.5 rounded-full flex-shrink-0 ml-2"><i class="fa fa-cogs mr-1"></i>Modello</span>
-                     </div>
-                    <p class="text-gray-400 text-xs mb-3 line-clamp-3 flex-grow">Oggetto: Follow-up Meeting: {{argomento_meeting}}\n\nCiao {{nome_contatto}}, Grazie per il tuo tempo oggi... Riepilogo: {{punto_chiave_1}}...</p>
-                     <div class="text-xs text-gray-500 mb-3">
-                        <i class="fa fa-robot mr-1"></i> Claude 3 Sonnet
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-4">
-                         <span class="text-xs bg-teal-900/50 text-teal-300 px-2 py-0.5 rounded-full border border-teal-700/50">#email</span>
-                         <span class="text-xs bg-cyan-900/50 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-700/50">#follow-up</span>
-                          <span class="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-700/50">#produttivita</span>
-                    </div>
-                    <a href="dashboard.html" class="mt-auto btn btn-outline btn-sm text-xs w-full">Aggiungi ai Miei Elementi <i class="fas fa-plus ml-1"></i></a>
-                 </div>
-            </div>
-             <div class="text-center mt-10">
-                <a href="dashboard.html" class="text-primary hover:text-primary-light font-semibold">
-                    Esplora tutta la libreria nell'app <i class="fas fa-arrow-right ml-1"></i>
-                </a>
-            </div>
+            <h1 class="text-lg font-semibold text-lightText-display">Prompt Maestro</h1>
         </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section id="get-started" class="section">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-primary rounded-lg shadow-xl p-8 md:p-12 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Pronto a prendere il controllo dei tuoi prompt?</h2>
-                <p class="text-lg text-indigo-100 mb-8 max-w-2xl mx-auto">Inizia oggi la prova gratuita di Prompt Maestro. Nessuna carta di credito richiesta.</p>
-                <a href="dashboard.html" class="btn btn-outline text-primary hover:bg-gray-100 px-8 py-3">Inizia Ora Gratuitamente</a>
-            </div>
+        <p class="text-lightText-subtle text-sm">© <span id="currentYear"></span> Prompt Maestro. Tutti i diritti riservati.</p>
+        <div class="mt-4 space-x-4">
+            <a href="#" class="text-xs text-lightText-subtle hover:text-brandPurple-light">Privacy Policy</a>
+            <a href="#" class="text-xs text-lightText-subtle hover:text-brandPurple-light">Termini di Servizio</a>
         </div>
-    </section>
+    </div>
+</footer>
 
-     <!-- Contact Section (Simple) -->
-    <section id="contact" class="section bg-gray-900/50">
-         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h2 class="text-3xl md:text-4xl font-bold mb-4">Hai domande?</h2>
-             <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">Siamo qui per aiutarti. Contattaci per qualsiasi informazione o supporto.</p>
-             <a href="mailto:supporto@promptmaestro.it" class="btn btn-outline">Contattaci via Email</a>
-             <p class="text-sm text-gray-500 mt-4">supporto@promptmaestro.it</p>
-         </div>
-    </section>
+<div id="toastNotificationLanding" class="fixed bottom-6 right-6 bg-darkBg-uiElement text-white py-3 px-6 rounded-lg shadow-2xl text-sm z-[100] hidden transition-all duration-300 ease-out transform translate-y-10 opacity-0">
+    <i class="fas mr-2"></i> <span id="toastMessageLanding"></span>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const basePromptContainer = document.getElementById('basePromptTemplate');
+        const originalPromptHTML = basePromptContainer.innerHTML;
+        const variableInputs = document.querySelectorAll('.variable-input');
+
+        function updateInteractivePrompt() {
+            let currentHTML = originalPromptHTML;
+            let allFilled = true;
+            variableInputs.forEach(input => {
+                const variableName = input.dataset.variable;
+                const variableValue = input.value.trim();
+                // More robust regex for replacing placeholders, handles special characters in variableName
+                const placeholderRegex = new RegExp(`\\[${variableName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]`, 'g');
+                if (variableValue) {
+                    // Basic sanitization to prevent HTML injection from input values
+                    const sanitizedValue = variableValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    currentHTML = currentHTML.replace(placeholderRegex, `<span class="text-accentTeal-light font-semibold">${sanitizedValue}</span>`); // Teal for filled
+                } else {
+                    allFilled = false; // If any input is empty, not all are filled
+                }
+            });
+            basePromptContainer.innerHTML = currentHTML;
+        }
+        variableInputs.forEach(input => input.addEventListener('input', updateInteractivePrompt));
+        updateInteractivePrompt(); // Initial call to set placeholders correctly
+
+        document.getElementById('copyInteractivePrompt').addEventListener('click', () => {
+            // Create a temporary element to correctly get innerText from HTML with styled spans
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = basePromptContainer.innerHTML;
+            // Replace multiple spaces that might occur from styling with a single space
+            let textToCopy = tempDiv.innerText.replace(/\s\s+/g, ' ').trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.getElementById('copyInteractivePrompt');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Copiato!';
+                btn.classList.remove('ph-button-secondary');
+                btn.classList.add('bg-accentTeal-DEFAULT', 'text-white'); // Use accent color for success
+                showToastLanding('Prompt copiato negli appunti!', 'success', 2500);
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-accentTeal-DEFAULT', 'text-white');
+                    btn.classList.add('ph-button-secondary');
+                }, 2500);
+            }).catch(err => showToastLanding('Errore nel copiare il prompt.', 'error', 3000));
+        });
+
+        document.querySelectorAll('header nav a[href^="#"], #mobileMenu a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+                // Close mobile menu if a link is clicked
+                if (document.getElementById('mobileMenu').classList.contains('flex')) {
+                    document.getElementById('mobileMenu').classList.remove('flex');
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                }
+            });
+        });
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const animatedElements = document.querySelectorAll('.animate-fadeInUp, .animate-fadeIn');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                    // entry.target.classList.add('is-visible'); // Optional: if you need to track visibility state
+                    observer.unobserve(entry.target); // Animate only once
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animatedElements.forEach(el => {
+            el.style.opacity = 0; // Ensure initial state for JS-driven animation
+            if (el.classList.contains('animate-fadeInUp')) {
+                 el.style.transform = 'translateY(25px)';
+            }
+            observer.observe(el);
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('flex'); // Use flex for proper layout
+            });
+        }
+    });
+
+    let toastTimeoutLanding;
+    function showToastLanding(message, type = 'info', duration = 3000) { // type can be 'info', 'success', 'error'
+        const toast = document.getElementById('toastNotificationLanding');
+        const toastMessage = document.getElementById('toastMessageLanding');
+        const iconElement = toast.querySelector('i');
+
+        if (!toast || !toastMessage || !iconElement) return;
+
+        toastMessage.textContent = message;
+
+        // Reset classes
+        toast.classList.remove('bg-darkBg-uiElement', 'bg-accentTeal-DEFAULT', 'bg-red-500');
+        iconElement.classList.remove('fa-info-circle', 'fa-check-circle', 'fa-exclamation-circle');
+
+        if (type === 'success') {
+            toast.classList.add('bg-accentTeal-DEFAULT'); // Use accent color for success
+            iconElement.classList.add('fa-check-circle');
+        } else if (type === 'error') {
+            toast.classList.add('bg-red-500');
+            iconElement.classList.add('fa-exclamation-circle');
+        } else { // info
+            toast.classList.add('bg-darkBg-uiElement');
+            iconElement.classList.add('fa-info-circle');
+        }
+
+        toast.classList.remove('hidden', 'translate-y-10', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
 
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 py-8">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400 text-sm">
-            <div class="flex justify-center items-center space-x-2 mb-4">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                     <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M9 13a4.5 4.5 0 0 0 3-4"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M12 13h4"></path><path d="M12 18h6a2 2 0 0 1 2 2v1"></path><path d="M12 8h8"></path><path d="M16 8V5a2 2 0 0 1 2-2"></path><circle cx="16" cy="13" r=".5"></circle><circle cx="18" cy="3" r=".5"></circle><circle cx="20" cy="21" r=".5"></circle><circle cx="20" cy="8" r=".5"></circle>
-                 </svg>
-                 <span class="font-semibold">PROMPT MAESTRO</span>
-             </div>
-            <p>&copy; 2024 Prompt Maestro. Tutti i diritti riservati.</p>
-            <p class="mt-1">Fatto con <i class="fas fa-heart text-red-500"></i> in Italia</p>
-             <!-- Add links to Privacy Policy, Terms of Service if applicable -->
-             <!-- <div class="mt-4 space-x-4">
-                 <a href="#" class="hover:text-white">Privacy Policy</a>
-                 <a href="#" class="hover:text-white">Termini di Servizio</a>
-             </div> -->
-        </div>
-    </footer>
-
+        clearTimeout(toastTimeoutLanding);
+        toastTimeoutLanding = setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => toast.classList.add('hidden'), 300); // Wait for transition to finish
+        }, duration);
+    }
+</script>
 </body>
 </html>
