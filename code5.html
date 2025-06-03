@@ -1,0 +1,973 @@
+
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Bibliotecario Digitale - Impara SQL</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .table-container {
+            max-height: 300px; /* Default height, can be overridden */
+            overflow-y: auto;
+            background-color: rgba(30, 41, 59, 0.8); /* Slightly transparent dark bg for table results */
+            border-radius: 0.5rem;
+        }
+        .sql-editor {
+            font-family: 'Courier New', monospace;
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        .animate-bounce-slow {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { /* Tailwind's bounce is 1s, this custom one is 2s */
+            0%, 100% {
+                transform: translateY(-15%);
+                animation-timing-function: cubic-bezier(0.8,0,1,1);
+            }
+            50% {
+                transform: translateY(0);
+                animation-timing-function: cubic-bezier(0,0,0.2,1);
+            }
+        }
+        /* Custom scrollbar for table containers */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        #query-results table, #table-preview table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        #query-results th, #table-preview th {
+            position: sticky;
+            top: 0;
+            background-color: #374151; /* Tailwind gray-700 */
+            z-index: 10;
+        }
+        /* Ensure editor and results can grow */
+        .editor-results-grid > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-results-grid #sql-editor {
+            flex-grow: 1; /* Allow textarea to grow */
+        }
+         .editor-results-grid .table-container {
+            flex-grow: 1; /* Allow results table to grow */
+            max-height: none; /* Remove fixed max-height if we want it to fill space */
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Header -->
+    <header class="glass-effect text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-book text-3xl animate-bounce-slow"></i>
+                <h1 class="text-2xl font-bold">Il Bibliotecario Digitale</h1>
+            </div>
+            <!-- Punti removed -->
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="text-center text-white animate__animated animate__fadeIn">
+            <div class="glass-effect p-8 rounded-2xl max-w-2xl mx-auto">
+                <i class="fas fa-user-graduate text-6xl mb-4 text-yellow-400"></i>
+                <h2 class="text-4xl font-bold mb-4">Benvenuto, Futuro Padrone di SQL!</h2>
+                <p class="text-lg mb-6">Inizia il tuo viaggio nell'apprendimento di SQL attraverso sfide divertenti e interattive. Gestisci la biblioteca digitale più moderna d'Italia!</p>
+                <div class="space-y-4">
+                    <button onclick="startQuiz()" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all transform hover:scale-105">
+                        <i class="fas fa-play mr-2"></i>Inizia il Percorso Guidato
+                    </button>
+                    <button onclick="directToLab()" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all transform hover:scale-105">
+                        <i class="fas fa-flask mr-2"></i>Vai Diretto al Laboratorio SQL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz-section" class="hidden animate__animated animate__fadeIn">
+            <div class="glass-effect p-6 rounded-2xl text-white">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">
+                        <i class="fas fa-brain mr-2 text-pink-400"></i>Riscaldamento SQL
+                    </h2>
+                    <div class="text-lg">
+                        Domanda <span id="current-question">1</span> di <span id="total-questions">20</span>
+                    </div>
+                </div>
+                
+                <div id="quiz-content" class="space-y-6">
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 id="question-text" class="text-xl mb-4"></h3>
+                        <div id="answers" class="space-y-3"></div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button onclick="previousQuestion()" id="prev-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-full" disabled>
+                            <i class="fas fa-arrow-left mr-2"></i>Precedente
+                        </button>
+                        <button onclick="nextQuestion()" id="next-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full">
+                            Prossima<i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Syntax Builder Section -->
+        <div id="syntax-builder-section" class="hidden animate__animated animate__fadeIn">
+            <div class="glass-effect p-6 rounded-2xl text-white">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-magic mr-2 text-teal-400"></i>Costruttore di Query Guidato</h2>
+                    <button onclick="skipSyntaxBuilderAndStartLab()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-full text-sm mb-4">
+                        Salta al Laboratorio SQL <i class="fas fa-angle-double-right ml-1"></i>
+                    </button>
+                </div>
+                <div id="syntax-challenge-content" class="space-y-4">
+                    <p id="syntax-challenge-description" class="text-lg bg-gray-800 p-3 rounded-md"></p>
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        <h4 class="font-semibold mb-2 text-gray-300">Query Costruita:</h4>
+                        <div id="built-query-display" class="sql-editor p-3 min-h-[3em] whitespace-pre-wrap border border-gray-700"></div>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        <h4 class="font-semibold mb-2 text-gray-300">Pulsanti Sintassi Disponibili:</h4>
+                        <div id="syntax-buttons-container" class="flex flex-wrap gap-2">
+                            <!-- Buttons will be populated here -->
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-6">
+                        <div class="flex space-x-2">
+                            <button onclick="clearBuiltQuery()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full">
+                                <i class="fas fa-trash mr-2"></i>Pulisci
+                            </button>
+                            <button onclick="undoLastSyntaxToken()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full">
+                                <i class="fas fa-undo mr-2"></i>Annulla
+                            </button>
+                        </div>
+                        <button onclick="checkSyntaxChallenge()" id="check-syntax-btn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full">
+                            <i class="fas fa-check mr-2"></i>Verifica Query
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Lab Section -->
+        <div id="lab-section" class="hidden animate__animated animate__fadeIn">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Database Schema -->
+                <div class="glass-effect p-6 rounded-2xl text-white">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-database mr-2 text-green-400"></i>Schema Database
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-green-400">Tabella: editore</h4>
+                            <p class="text-sm text-gray-300">idEditore (INTEGER, PK), nome (TEXT), sede (TEXT), citta (TEXT)</p>
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-blue-400">Tabella: libro</h4>
+                            <p class="text-sm text-gray-300">idLibro (INTEGER, PK), titolo (TEXT), autore (TEXT), prezzo (REAL), genere (TEXT), codEditore (INTEGER, FK)</p>
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-purple-400">Tabella: prodotto</h4>
+                            <p class="text-sm text-gray-300">codProdotto (TEXT, PK), descrizioneProdotto (TEXT), codMagazzino (TEXT), quantitaProdotto (INTEGER), indirizzoMagazzino (TEXT), magazziniere (TEXT)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Challenge -->
+                <div class="glass-effect p-6 rounded-2xl text-white">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-target mr-2 text-red-400"></i>Sfida Corrente (<span id="challenge-counter">1</span>/<span id="total-challenges-count">N</span>)
+                    </h3>
+                    <div id="current-challenge" class="bg-gray-800 p-4 rounded-lg">
+                        <h4 id="challenge-title" class="font-semibold mb-2"></h4>
+                        <p id="challenge-description" class="text-gray-300 mb-4"></p>
+                        <!-- Hint is now shown via SweetAlert on Aiuto button click, so removed from here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Editor and Results Side-by-Side -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 editor-results-grid">
+                <!-- Column 1: Editor -->
+                <div class="glass-effect p-6 rounded-2xl text-white">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-code mr-2 text-cyan-400"></i>Editor SQL
+                    </h3>
+                    <textarea id="sql-editor" class="sql-editor w-full h-64 p-4 border-2 border-gray-600 focus:border-cyan-400 resize-y" placeholder="Scrivi qui la tua query SQL..."></textarea>
+                    <div class="flex flex-wrap justify-between items-center mt-4 gap-2">
+                        <div class="flex space-x-2">
+                            <button onclick="testQuery()" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2 rounded-full font-semibold">
+                                <i class="fas fa-vial mr-2"></i>Testa Query
+                            </button>
+                            <button onclick="submitQuery()" id="submit-query-btn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full font-semibold">
+                                <i class="fas fa-check mr-2"></i>Sottoponi (Ctrl+Enter)
+                            </button>
+                            <button onclick="clearEditor()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-full">
+                                <i class="fas fa-trash mr-2"></i>Pulisci (Ctrl+K)
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                             <button onclick="showHint()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full">
+                                <i class="fas fa-question mr-2"></i>Aiuto
+                            </button>
+                            <button onclick="showCheatSheet()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full">
+                                <i class="fas fa-book-open mr-2"></i>Cheat Sheet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Results -->
+                <div class="glass-effect p-6 rounded-2xl text-white"> 
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-table mr-2 text-orange-400"></i>Risultati Query
+                    </h3>
+                    <div id="query-results" class="table-container">
+                        <p class="text-gray-400 p-4">Testa o sottoponi una query per vedere i risultati qui.</p>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+
+        <!-- Game Phases Navigation (Progress Bar for Lab) -->
+        <div id="game-phases" class="hidden mt-6">
+            <div class="glass-effect p-6 rounded-2xl text-white">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-tasks mr-2 text-pink-400"></i>Progresso Sfide Laboratorio
+                </h3>
+                <div id="challenge-progress-bar" class="w-full bg-gray-700 rounded-full h-4 mb-4">
+                    <div id="challenge-progress-fill" class="bg-green-500 h-4 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+                <p id="progress-text" class="text-center">Completa le sfide per avanzare!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let db; // SQL.js database instance
+        // Game State
+        let gameState = {
+            currentQuiz: 0,
+            currentChallengeIndex: 0,
+            currentSyntaxChallengeIndex: 0,
+            builtQueryTokens: []
+        };
+
+        // Sample Data (will be inserted into sql.js)
+        const sampleData = {
+            editore: [
+                {idEditore: 1, nome: 'Mondadori', sede: 'Via Mondadori 1', citta: 'Milano'},
+                {idEditore: 2, nome: 'Einaudi', sede: 'Via Einaudi 15', citta: 'Torino'},
+                {idEditore: 3, nome: 'Feltrinelli', sede: 'Viale Pasubio 5', citta: 'Milano'},
+                {idEditore: 4, nome: 'Rizzoli', sede: 'Via Rizzoli 8', citta: 'Milano'},
+                {idEditore: 5, nome: 'Adelphi', sede: 'Via San Giovanni 30', citta: 'Milano'}
+            ],
+            libro: [
+                {idLibro: 1, titolo: 'Il Nome della Rosa', autore: 'Umberto Eco', prezzo: 18.50, genere: 'Storico', codEditore: 1},
+                {idLibro: 2, titolo: 'Se questo è un uomo', autore: 'Primo Levi', prezzo: 15.00, genere: 'Testimonianza', codEditore: 2},
+                {idLibro: 3, titolo: 'Il Gattopardo', autore: 'Giuseppe Tomasi di Lampedusa', prezzo: 16.90, genere: 'Classico', codEditore: 3},
+                {idLibro: 4, titolo: 'La Storia', autore: 'Elsa Morante', prezzo: 19.50, genere: 'Romanzo', codEditore: 2},
+                {idLibro: 5, titolo: 'Fontamara', autore: 'Ignazio Silone', prezzo: 14.20, genere: 'Sociale', codEditore: 1},
+                {idLibro: 6, titolo: 'Il fu Mattia Pascal', autore: 'Luigi Pirandello', prezzo: 12.80, genere: 'Classico', codEditore: 4},
+                {idLibro: 7, titolo: 'La coscienza di Zeno', autore: 'Italo Svevo', prezzo: 17.30, genere: 'Psicologico', codEditore: 5}
+            ],
+            prodotto: [
+                {codProdotto: 'P001', descrizioneProdotto: 'Segnalibro magnetico', codMagazzino: 'MAG01', quantitaProdotto: 150, indirizzoMagazzino: 'Via Roma 10, Milano', magazziniere: 'Mario Rossi'},
+                {codProdotto: 'P002', descrizioneProdotto: 'Copertina protettiva', codMagazzino: 'MAG01', quantitaProdotto: 85, indirizzoMagazzino: 'Via Roma 10, Milano', magazziniere: 'Mario Rossi'},
+                {codProdotto: 'P003', descrizioneProdotto: 'Etichette adesive', codMagazzino: 'MAG02', quantitaProdotto: 200, indirizzoMagazzino: 'Via Dante 25, Roma', magazziniere: 'Laura Bianchi'},
+                {codProdotto: 'P004', descrizioneProdotto: 'Scanner codici a barre', codMagazzino: 'MAG02', quantitaProdotto: 12, indirizzoMagazzino: 'Via Dante 25, Roma', magazziniere: 'Laura Bianchi'}
+            ]
+        };
+
+        // Quiz Questions (Expanded to 20)
+        const quizQuestions = [
+            { question: "Quale comando SQL viene utilizzato per recuperare dati da una tabella?", answers: ["SELECT", "GET", "RETRIEVE", "FETCH"], correct: 0, explanation: "SELECT è il comando fondamentale per recuperare dati." },
+            { question: "Cosa significa la normalizzazione in un database?", answers: ["Aumentare le prestazioni", "Ridurre la ridondanza dei dati", "Creare backup", "Ottimizzare le query"], correct: 1, explanation: "La normalizzazione riduce la ridondanza e migliora l'integrità." },
+            { question: "Quale tipo di JOIN restituisce solo le righe con corrispondenze in entrambe le tabelle?", answers: ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "OUTER JOIN"], correct: 2, explanation: "INNER JOIN restituisce solo righe con corrispondenze in entrambe le tabelle." },
+            { question: "Quale clausola filtra i risultati in una query SELECT?", answers: ["FILTER", "WHERE", "HAVING", "WHEN"], correct: 1, explanation: "WHERE specifica le condizioni per le righe restituite." },
+            { question: "Cosa identifica univocamente ogni riga in una tabella?", answers: ["Indice", "Chiave esterna", "Chiave primaria", "Attributo"], correct: 2, explanation: "La chiave primaria identifica univocamente ogni riga." },
+            { question: "Quale comando SQL si usa per inserire nuovi dati in una tabella?", answers: ["ADD", "INSERT INTO", "CREATE NEW", "PUT"], correct: 1, explanation: "INSERT INTO è usato per aggiungere nuove righe a una tabella." },
+            { question: "Come si eliminano righe da una tabella?", answers: ["REMOVE FROM", "ERASE FROM", "DELETE FROM", "DROP FROM"], correct: 2, explanation: "DELETE FROM rimuove righe da una tabella basate su una condizione." },
+            { question: "Quale comando modifica dati esistenti in una tabella?", answers: ["MODIFY", "CHANGE", "ALTER", "UPDATE"], correct: 3, explanation: "UPDATE è usato per modificare i record esistenti in una tabella." },
+            { question: "Cosa fa la clausola GROUP BY?", answers: ["Ordina i risultati", "Raggruppa righe con valori identici in colonne specificate", "Filtra i gruppi", "Unisce tabelle"], correct: 1, explanation: "GROUP BY raggruppa righe che hanno gli stessi valori nelle colonne specificate in righe di riepilogo." },
+            { question: "Quale funzione di aggregazione restituisce il numero di righe?", answers: ["SUM()", "TOTAL()", "COUNT()", "NUMBER()"], correct: 2, explanation: "COUNT() restituisce il numero di righe che soddisfano un criterio." },
+            { question: "Per cosa si usa la clausola HAVING?", answers: ["Per filtrare righe prima del raggruppamento", "Per filtrare gruppi dopo il raggruppamento", "Per ordinare i risultati", "Per definire condizioni di join"], correct: 1, explanation: "HAVING è usata per filtrare i gruppi creati da GROUP BY." },
+            { question: "Quale parola chiave si usa per ordinare i risultati?", answers: ["SORT BY", "ORDER BY", "ARRANGE BY", "ALIGN BY"], correct: 1, explanation: "ORDER BY è usata per ordinare il set di risultati in ordine ascendente o discendente." },
+            { question: "Cosa fa l'operatore LIKE in una clausola WHERE?", answers: ["Confronta valori esatti", "Cerca un pattern specificato in una colonna", "Verifica se un valore è nullo", "Combina condizioni multiple"], correct: 1, explanation: "LIKE è usato con caratteri jolly (es. %, _) per cercare pattern in stringhe." },
+            { question: "Qual è la differenza tra WHERE e HAVING?", answers: ["Nessuna differenza", "WHERE filtra righe, HAVING filtra gruppi", "WHERE filtra gruppi, HAVING filtra righe", "WHERE è per stringhe, HAVING per numeri"], correct: 1, explanation: "WHERE filtra le righe prima che vengano raggruppate, HAVING filtra i gruppi dopo che sono stati creati." },
+            { question: "Cosa fa `SELECT DISTINCT colonna`?", answers: ["Seleziona tutte le colonne", "Seleziona solo la colonna specificata", "Restituisce solo valori unici dalla colonna specificata", "Ordina la colonna specificata"], correct: 2, explanation: "DISTINCT rimuove i duplicati dalla colonna specificata nel risultato." },
+            { question: "Quale JOIN restituisce tutte le righe dalla tabella di sinistra e le righe corrispondenti dalla tabella di destra?", answers: ["INNER JOIN", "FULL OUTER JOIN", "RIGHT JOIN", "LEFT JOIN"], correct: 3, explanation: "LEFT JOIN (o LEFT OUTER JOIN) restituisce tutte le righe dalla tabella di sinistra e le righe corrispondenti dalla tabella di destra. Se non c'è corrispondenza, il risultato è NULL dal lato destro." },
+            { question: "Come si crea una nuova tabella in SQL?", answers: ["NEW TABLE nome_tabella", "MAKE TABLE nome_tabella", "CREATE TABLE nome_tabella", "DEFINE TABLE nome_tabella"], correct: 2, explanation: "CREATE TABLE è il comando standard SQL per creare una nuova tabella." },
+            { question: "Cosa rappresenta NULL in SQL?", answers: ["Una stringa vuota ''", "Il valore zero 0", "Un valore mancante o sconosciuto", "Un errore"], correct: 2, explanation: "NULL indica che un valore di dato non esiste nel database, o è mancante/sconosciuto." },
+            { question: "Quale comando SQL rimuove completamente una tabella dal database?", answers: ["DELETE TABLE nome_tabella", "REMOVE TABLE nome_tabella", "DROP TABLE nome_tabella", "CLEAR TABLE nome_tabella"], correct: 2, explanation: "DROP TABLE elimina una tabella intera, inclusa la sua struttura e tutti i dati." },
+            { question: "Come si aggiunge un commento in una riga SQL?", answers: ["// commento", "/* commento */", "-- commento", "# commento"], correct: 2, explanation: "Due trattini (--) all'inizio di una riga indicano un commento in SQL standard." }
+        ];
+        
+        // Syntax Builder Challenges
+        const syntaxChallenges = [
+            { 
+                description: "Seleziona tutte le colonne (*) e tutte le righe dalla tabella 'editore'.", 
+                solutionTokens: ["SELECT", "*", "FROM", "editore"],
+                availableButtons: ["SELECT", "*", "FROM", "editore", "libro", "WHERE", "nome", "citta", ",", ";"] 
+            },
+            { 
+                description: "Mostra solo la colonna 'nome' dalla tabella 'editore'.",
+                solutionTokens: ["SELECT", "nome", "FROM", "editore"],
+                availableButtons: ["SELECT", "nome", "citta", "sede", "*", "FROM", "editore", "libro", "WHERE", ";"]
+            },
+            {
+                description: "Seleziona tutte le colonne (*) dalla tabella 'libro' dove il 'genere' è uguale a 'Classico'.",
+                solutionTokens: ["SELECT", "*", "FROM", "libro", "WHERE", "genere", "=", "'Classico'"],
+                availableButtons: ["SELECT", "*", "FROM", "libro", "editore", "WHERE", "genere", "autore", "=", "<", ">", "'Classico'", "'Storico'", "prezzo", ";"]
+            }
+        ];
+
+
+        // Game Challenges (Lab) - Points removed
+        const challenges = [
+            { phase: 1, title: "Esploratore: Tutti gli Editori", description: "Mostra tutti i dati dalla tabella 'editore'.", hint: "Usa SELECT * FROM nome_tabella.", solution: "SELECT * FROM editore;" },
+            { phase: 1, title: "Esploratore: Nomi e Città Editori", description: "Mostra solo il nome e la città di tutti gli editori.", hint: "Usa SELECT colonna1, colonna2 FROM nome_tabella.", solution: "SELECT nome, citta FROM editore;" },
+            { phase: 1, title: "Bibliofilo: Tutti i Libri", description: "Recupera tutte le informazioni sui libri disponibili.", hint: "Simile a come hai fatto per gli editori, ma sulla tabella 'libro'.", solution: "SELECT * FROM libro;" },
+            { phase: 1, title: "Bibliofilo: Titoli e Autori dei Libri", description: "Elenca il titolo e l'autore di ogni libro.", hint: "Seleziona solo le colonne 'titolo' e 'autore' dalla tabella 'libro'.", solution: "SELECT titolo, autore FROM libro;" },
+            { phase: 1, title: "Inventario: Tutti i Prodotti", description: "Visualizza tutti i dettagli dei prodotti in magazzino.", hint: "Query sulla tabella 'prodotto'.", solution: "SELECT * FROM prodotto;" },
+            { phase: 1, title: "Inventario: Descrizione e Quantità Prodotti", description: "Mostra la descrizione e la quantità di ciascun prodotto.", hint: "Seleziona 'descrizioneProdotto' e 'quantitaProdotto' dalla tabella 'prodotto'.", solution: "SELECT descrizioneProdotto, quantitaProdotto FROM prodotto;" },
+            
+            { phase: 1, title: "Detective SQL: Editori Milanesi", description: "Trova tutti gli editori che hanno sede a 'Milano'.", hint: "Usa la clausola WHERE per filtrare sulla colonna 'citta'. Le stringhe vogliono apici singoli: 'Milano'.", solution: "SELECT * FROM editore WHERE citta = 'Milano';" },
+            { phase: 1, title: "Detective SQL: Libri di Eco", description: "Trova tutti i libri scritti da 'Umberto Eco'.", hint: "Filtra la tabella 'libro' per la colonna 'autore'.", solution: "SELECT * FROM libro WHERE autore = 'Umberto Eco';" },
+            { phase: 1, title: "Detective SQL: Libri Economici", description: "Mostra i libri che costano meno di 15 euro.", hint: "Usa l'operatore < con la colonna 'prezzo'. I numeri non vogliono apici.", solution: "SELECT * FROM libro WHERE prezzo < 15;" },
+            { phase: 1, title: "Detective SQL: Prodotti Scarsi", description: "Elenca i prodotti con quantità inferiore a 50 unità.", hint: "Filtra 'prodotto' per 'quantitaProdotto'.", solution: "SELECT * FROM prodotto WHERE quantitaProdotto < 50;" },
+
+            { phase: 2, title: "Architetto DB: Libri e Editori", description: "Mostra il titolo del libro e il nome del suo editore.", hint: "Usa INNER JOIN per collegare 'libro' (l) ed 'editore' (e) su 'l.codEditore = e.idEditore'. Seleziona 'l.titolo' ed 'e.nome'.", solution: "SELECT libro.titolo, editore.nome FROM libro INNER JOIN editore ON libro.codEditore = editore.idEditore;" },
+            { phase: 2, title: "Architetto DB: Conteggio Libri per Editore", description: "Conta quanti libri ha pubblicato ogni editore. Mostra il nome dell'editore e il conteggio.", hint: "Usa COUNT(l.idLibro) e GROUP BY e.nome. Unisci 'editore' (e) e 'libro' (l). LEFT JOIN è utile per includere editori senza libri.", solution: "SELECT e.nome, COUNT(l.idLibro) AS numero_libri FROM editore e LEFT JOIN libro l ON e.idEditore = l.codEditore GROUP BY e.nome;" },
+            
+            { phase: 3, title: "Maestro JOIN: Libri Costosi di Milano", description: "Trova libri con prezzo > 17€ pubblicati da editori di Milano. Mostra titolo, prezzo e nome editore.", hint: "Combina JOIN e WHERE con condizioni multiple (AND).", solution: "SELECT l.titolo, l.prezzo, e.nome AS nome_editore FROM libro l INNER JOIN editore e ON l.codEditore = e.idEditore WHERE l.prezzo > 17 AND e.citta = 'Milano';" },
+            { phase: 3, title: "Maestro Query: Autori e Loro Generi", description: "Mostra ogni autore e i generi dei libri che ha scritto (senza duplicati di genere per autore).", hint: "Usa SELECT DISTINCT autore, genere FROM libro ORDER BY autore, genere;", solution: "SELECT DISTINCT autore, genere FROM libro ORDER BY autore, genere;" },
+
+            { phase: 4, title: "Sfida Finale: Editore del Libro Più Costoso", description: "Trova l'editore (nome e città) del libro più costoso. Mostra anche titolo e prezzo del libro.", hint: "Usa una subquery con MAX(prezzo) o ORDER BY prezzo DESC LIMIT 1.", solution: "SELECT e.nome, e.citta, l.titolo, l.prezzo FROM editore e JOIN libro l ON e.idEditore = l.codEditore WHERE l.prezzo = (SELECT MAX(prezzo) FROM libro);" }
+        ];
+
+
+        async function initSqlJsDatabase() {
+            try {
+                const SQL = await initSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+                });
+                db = new SQL.Database();
+
+                db.run("CREATE TABLE editore (idEditore INTEGER PRIMARY KEY, nome TEXT, sede TEXT, citta TEXT);");
+                db.run("CREATE TABLE libro (idLibro INTEGER PRIMARY KEY, titolo TEXT, autore TEXT, prezzo REAL, genere TEXT, codEditore INTEGER, FOREIGN KEY (codEditore) REFERENCES editore(idEditore));");
+                db.run("CREATE TABLE prodotto (codProdotto TEXT PRIMARY KEY, descrizioneProdotto TEXT, codMagazzino TEXT, quantitaProdotto INTEGER, indirizzoMagazzino TEXT, magazziniere TEXT);");
+
+                sampleData.editore.forEach(row => db.run("INSERT INTO editore VALUES (?, ?, ?, ?);", [row.idEditore, row.nome, row.sede, row.citta]));
+                sampleData.libro.forEach(row => db.run("INSERT INTO libro VALUES (?, ?, ?, ?, ?, ?);", [row.idLibro, row.titolo, row.autore, row.prezzo, row.genere, row.codEditore]));
+                sampleData.prodotto.forEach(row => db.run("INSERT INTO prodotto VALUES (?, ?, ?, ?, ?, ?);", [row.codProdotto, row.descrizioneProdotto, row.codMagazzino, row.quantitaProdotto, row.indirizzoMagazzino, row.magazziniere]));
+                
+                console.log("Database SQL.js inizializzato e popolato.");
+            } catch (err) {
+                console.error("Errore inizializzazione SQL.js:", err);
+                Swal.fire({ icon: 'error', title: 'Errore Caricamento Database', text: 'Impossibile inizializzare il database SQL.js. Ricarica la pagina.', confirmButtonColor: '#ef4444' });
+            }
+        }
+        
+        async function initGame() {
+            await initSqlJsDatabase();
+            document.getElementById('total-challenges-count').textContent = challenges.length;
+        }
+
+        // Navigation
+        function showScreen(screenId) {
+            ['welcome-screen', 'quiz-section', 'syntax-builder-section', 'lab-section', 'game-phases'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            if (screenId) {
+                 document.getElementById(screenId).classList.remove('hidden');
+            }
+        }
+
+        function startQuiz() {
+            showScreen('quiz-section');
+            loadQuizQuestion();
+        }
+
+        function startSyntaxBuilder() {
+            showScreen('syntax-builder-section');
+            gameState.currentSyntaxChallengeIndex = 0;
+            gameState.builtQueryTokens = [];
+            loadSyntaxChallenge();
+        }
+        
+        function skipSyntaxBuilderAndStartLab() {
+            startLab();
+        }
+
+        function startLab() {
+            showScreen('lab-section');
+            document.getElementById('game-phases').classList.remove('hidden'); // Show progress bar section specifically for lab
+            if (!db) { 
+                initSqlJsDatabase().then(() => {
+                    loadChallenge();
+                    // Default table preview removed, user clicks to see tables
+                });
+            } else {
+                loadChallenge();
+            }
+        }
+        
+        function directToLab() { // For "Vai Diretto al Laboratorio SQL" button
+            startLab();
+        }
+
+
+        // Quiz Functions
+        function loadQuizQuestion() {
+            const question = quizQuestions[gameState.currentQuiz];
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('current-question').textContent = gameState.currentQuiz + 1;
+            document.getElementById('total-questions').textContent = quizQuestions.length;
+            
+            const answersContainer = document.getElementById('answers');
+            answersContainer.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all';
+                button.textContent = answer;
+                button.onclick = () => selectAnswer(index);
+                answersContainer.appendChild(button);
+            });
+            updateQuizButtons();
+        }
+
+        function selectAnswer(index) {
+            const question = quizQuestions[gameState.currentQuiz];
+            const buttons = document.querySelectorAll('#answers button');
+            
+            buttons.forEach((btn, i) => {
+                btn.classList.remove('bg-green-500', 'bg-red-500'); 
+                if (i === question.correct) {
+                    btn.classList.add('bg-green-500'); 
+                } else if (i === index && i !== question.correct) {
+                    btn.classList.add('bg-red-500'); 
+                }
+                btn.disabled = true;
+            });
+
+            if (index === question.correct) {
+                Swal.fire({ icon: 'success', title: 'Corretto!', text: question.explanation, confirmButtonColor: '#10b981', timer: 2000, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Sbagliato!', text: question.explanation, confirmButtonColor: '#ef4444', timer: 2500, showConfirmButton: false });
+            }
+            setTimeout(() => {
+                if (!document.getElementById('next-btn').disabled || gameState.currentQuiz === quizQuestions.length - 1) {
+                     nextQuestion();
+                }
+            }, index === question.correct ? 2100 : 2600);
+        }
+        
+        function nextQuestion() {
+            if (gameState.currentQuiz < quizQuestions.length - 1) {
+                gameState.currentQuiz++;
+                loadQuizQuestion();
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quiz Completato!',
+                    text: `Hai risposto a tutte le domande. Ora passiamo al costruttore di query guidato!`,
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    startSyntaxBuilder();
+                });
+            }
+        }
+
+        function previousQuestion() {
+            if (gameState.currentQuiz > 0) {
+                gameState.currentQuiz--;
+                loadQuizQuestion();
+            }
+        }
+
+        function updateQuizButtons() {
+            document.getElementById('prev-btn').disabled = gameState.currentQuiz === 0;
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.textContent = gameState.currentQuiz === quizQuestions.length - 1 ? 'Finisci Quiz' : 'Prossima';
+        }
+
+        // Syntax Builder Functions
+        function loadSyntaxChallenge() {
+            if (gameState.currentSyntaxChallengeIndex >= syntaxChallenges.length) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Costruttore di Query Completato!',
+                    text: "Ottimo lavoro con le basi! Ora sei pronto per il Laboratorio SQL completo.",
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    startLab();
+                });
+                return;
+            }
+            const challenge = syntaxChallenges[gameState.currentSyntaxChallengeIndex];
+            document.getElementById('syntax-challenge-description').textContent = challenge.description;
+            
+            const buttonsContainer = document.getElementById('syntax-buttons-container');
+            buttonsContainer.innerHTML = '';
+            challenge.availableButtons.forEach(token => {
+                const button = document.createElement('button');
+                button.className = 'bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-mono';
+                button.textContent = token;
+                button.onclick = () => addSyntaxToken(token);
+                buttonsContainer.appendChild(button);
+            });
+            updateBuiltQueryDisplay();
+            document.getElementById('check-syntax-btn').disabled = false;
+        }
+
+        function addSyntaxToken(token) {
+            gameState.builtQueryTokens.push(token);
+            updateBuiltQueryDisplay();
+        }
+
+        function undoLastSyntaxToken() {
+            gameState.builtQueryTokens.pop();
+            updateBuiltQueryDisplay();
+        }
+
+        function clearBuiltQuery() {
+            gameState.builtQueryTokens = [];
+            updateBuiltQueryDisplay();
+        }
+
+        function updateBuiltQueryDisplay() {
+            document.getElementById('built-query-display').textContent = gameState.builtQueryTokens.join(' ');
+        }
+
+        function checkSyntaxChallenge() {
+            const currentChallengeDef = syntaxChallenges[gameState.currentSyntaxChallengeIndex];
+            const userQuery = gameState.builtQueryTokens.join(' ');
+            const expectedQuery = currentChallengeDef.solutionTokens.join(' ');
+
+            // Normalize by removing trailing semicolons for comparison if desired, though current challenges expect it or not based on solutionTokens
+            const normalize = (queryStr) => queryStr.replace(/;\s*$/, "").trim();
+            
+            if (normalize(userQuery) === normalize(expectedQuery)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Corretto!',
+                    text: 'Query costruita correttamente!',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    gameState.currentSyntaxChallengeIndex++;
+                    gameState.builtQueryTokens = [];
+                    loadSyntaxChallenge();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Non Corretto',
+                    text: 'La query costruita non è quella attesa. Riprova!',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        }
+
+
+        // Lab Functions
+        function loadChallenge() {
+            if (gameState.currentChallengeIndex >= challenges.length) {
+                completeGame();
+                return;
+            }
+            const challenge = challenges[gameState.currentChallengeIndex];
+            document.getElementById('challenge-title').textContent = challenge.title;
+            document.getElementById('challenge-description').textContent = challenge.description;
+            // Hint is shown via showHint() on button click
+            document.getElementById('challenge-counter').textContent = gameState.currentChallengeIndex + 1;
+            updateChallengeProgress();
+        }
+
+        function updateChallengeProgress() {
+            const progress = ((gameState.currentChallengeIndex) / challenges.length) * 100;
+            document.getElementById('challenge-progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Sfida ${gameState.currentChallengeIndex} di ${challenges.length} completata.`;
+             if (gameState.currentChallengeIndex === challenges.length) {
+                document.getElementById('progress-text').textContent = `Tutte le ${challenges.length} sfide completate!`;
+            }
+        }
+        
+        async function executeQueryAndDisplay(query) {
+            if (!db) {
+                Swal.fire({ icon: 'error', title: 'Database non pronto', text: 'Il database SQL non è ancora stato caricato. Attendi.', confirmButtonColor: '#f59e0b' });
+                return { success: false, errorType: 'db_not_ready' };
+            }
+            if (!query) {
+                // This case handled by callers (testQuery, submitQuery)
+                return { success: false, errorType: 'empty_query' };
+            }
+
+            try {
+                const resultsArray = db.exec(query);
+                displayQueryResults(resultsArray);
+                return { success: true, results: resultsArray };
+            } catch (e) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore SQL!',
+                    html: `<p>C'è stato un errore nell'esecuzione della tua query:</p><pre class="text-left text-sm bg-gray-800 p-2 rounded mt-2">${e.message}</pre>`,
+                    confirmButtonColor: '#ef4444'
+                });
+                displayQueryResults([]); // Clear results or show error message in results area
+                return { success: false, errorType: 'sql_error', message: e.message };
+            }
+        }
+
+        async function testQuery() {
+            const query = document.getElementById('sql-editor').value.trim();
+            if (!query) {
+                Swal.fire({ icon: 'warning', title: 'Query Vuota', text: 'Scrivi una query SQL prima di testarla!', confirmButtonColor: '#f59e0b' });
+                return;
+            }
+            await executeQueryAndDisplay(query);
+            // No challenge checking here
+        }
+
+        async function submitQuery() {
+            const query = document.getElementById('sql-editor').value.trim();
+            if (!query) {
+                Swal.fire({ icon: 'warning', title: 'Query Vuota', text: 'Scrivi una query SQL prima di sottoporla!', confirmButtonColor: '#f59e0b' });
+                return;
+            }
+
+            const executionResult = await executeQueryAndDisplay(query);
+
+            if (executionResult.success) { // SQL query ran without syntax errors
+                const currentChallenge = challenges[gameState.currentChallengeIndex];
+                if (checkQueryCorrectness(query, currentChallenge)) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '🎉 Corretto!',
+                        text: `Ottimo lavoro! Hai risolto la sfida.`,
+                        confirmButtonColor: '#10b981',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        nextChallenge();
+                    });
+                } else {
+                     Swal.fire({
+                        icon: 'info',
+                        title: 'Risultato Parziale o Diverso',
+                        text: "La query è stata eseguita, ma il risultato non corrisponde perfettamente alla soluzione attesa per la sfida. Controlla i dati o prova una query diversa! Usa l'aiuto se necessario.",
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            }
+            // If executionResult.success is false, executeQueryAndDisplay already showed the SQL error Swal.
+        }
+
+
+        function compareResults(res1, res2) { // (Kept as is, robust comparison)
+            if (!res1 && !res2) return true;
+            if (!res1 || !res2) return false;
+
+            // Compare column names (case-insensitive, order-insensitive)
+            if (res1.columns.length !== res2.columns.length) return false;
+            const r1Cols = res1.columns.map(c => String(c).toLowerCase()).sort();
+            const r2Cols = res2.columns.map(c => String(c).toLowerCase()).sort();
+            for (let i = 0; i < r1Cols.length; i++) {
+                if (r1Cols[i] !== r2Cols[i]) return false;
+            }
+            
+            if (res1.values.length !== res2.values.length) return false;
+            if (res1.values.length === 0) return true;
+
+            // Normalize and sort rows for comparison (makes it order-agnostic for rows and columns within rows)
+            // For each row, create a sorted string representation of its cell values
+            const normalizeRow = (row, columnOrder) => {
+                const orderedRow = [];
+                columnOrder.forEach(colName => {
+                    const colIndex = res1.columns.findIndex(c => String(c).toLowerCase() === colName); // Use original column order from res1 for mapping
+                    orderedRow.push(String(row[colIndex]));
+                });
+                return JSON.stringify(orderedRow); // Keep cell order based on solution's column order
+            };
+            
+            const solutionColumnOrder = r2Cols; // Use sorted column names of solution as the canonical order
+
+            const v1 = res1.values.map(row => normalizeRow(row, solutionColumnOrder)).sort();
+            const v2 = res2.values.map(row => normalizeRow(row, solutionColumnOrder)).sort(); // Solution values also normalized and sorted
+            
+            for (let i = 0; i < v1.length; i++) {
+                if (v1[i] !== v2[i]) return false;
+            }
+            return true;
+        }
+
+        function checkQueryCorrectness(userQuery, challenge) {
+            if (!db) return false;
+            try {
+                // It's crucial that db.exec() is called on a fresh state or that previous statements don't alter what we test
+                // For SELECTs, this is fine. For DML/DDL, this might need care if the challenge expects DB state change.
+                // The current challenges are all SELECTs, so this should be okay.
+
+                const userResultsRaw = db.exec(userQuery);
+                // Re-execute solution query on potentially 'fresh' data (or same state as user)
+                // If user query could be DML, this needs careful thought. For now, assuming SELECTs or idempotent DML.
+                const solutionResultsRaw = db.exec(challenge.solution);
+
+                const userResult = (userResultsRaw.length > 0 && userResultsRaw[0].columns) ? userResultsRaw[0] : { columns: [], values: [] };
+                const solutionResult = (solutionResultsRaw.length > 0 && solutionResultsRaw[0].columns) ? solutionResultsRaw[0] : { columns: [], values: [] };
+                
+                // Handle cases where queries are not SELECT (e.g. DDL/DML that return empty array or different structure)
+                if (userResultsRaw.length === 0 && solutionResultsRaw.length === 0) { // Both non-SELECT and successful (e.g. UPDATE, INSERT, DELETE)
+                     // For DML, we might need to check DB state, not just result sets.
+                     // For now, if both return no data and no error, assume "correct" if solution is also non-SELECT
+                     // This part is tricky if we mix SELECT challenges with DML challenges.
+                     // Current challenges are SELECT based.
+                     return true; 
+                }
+                if ( (userResultsRaw.length === 0 && solutionResultsRaw.length > 0 && solutionResultsRaw[0].columns.length > 0) || 
+                     (userResultsRaw.length > 0 && userResultsRaw[0].columns.length > 0 && solutionResultsRaw.length === 0) ) {
+                    return false; // One is SELECT with results, other is not.
+                }
+                 if (userResultsRaw.length > 0 && !userResultsRaw[0].columns && solutionResultsRaw.length > 0 && solutionResultsRaw[0].columns) {
+                    return false; // User query was non-SELECT, solution was SELECT
+                }
+                if (solutionResultsRaw.length > 0 && !solutionResultsRaw[0].columns && userResultsRaw.length > 0 && userResultsRaw[0].columns) {
+                    return false; // Solution query was non-SELECT, user was SELECT
+                }
+
+                return compareResults(userResult, solutionResult);
+            } catch (e) {
+                console.error("Error during solution checking:", e.message, "User Query:", userQuery, "Solution:", challenge.solution);
+                return false; // Error in user's query (already caught) or solution query (problem with challenge def)
+            }
+        }
+        
+        function displayQueryResults(resultsArray) {
+            const resultsContainer = document.getElementById('query-results');
+            resultsContainer.innerHTML = ''; 
+
+            if (!resultsArray || resultsArray.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-gray-400 p-4">Query eseguita. Nessun set di risultati restituito (es. per comandi non-SELECT o nessun dato trovato).</p>';
+            } else {
+                resultsArray.forEach((result) => {
+                    if (result && result.columns && result.values) {
+                        const tableElement = createTableFromSqlJsResult(result);
+                        resultsContainer.appendChild(tableElement);
+                    } else if (resultsArray.length === 1 && Object.keys(result).length === 0 && !result.columns && !result.values) {
+                        resultsContainer.innerHTML = '<p class="text-green-400 p-4">Comando SQL (non-SELECT) eseguito con successo.</p>';
+                    } else {
+                         // Catch-all for unexpected result structure
+                         resultsContainer.innerHTML = '<p class="text-yellow-400 p-4">La query ha prodotto un risultato non tabulare o inatteso.</p>';
+                    }
+                });
+            }
+        }
+
+        function createTableFromSqlJsResult(sqlJsResult) {
+            const table = document.createElement('table');
+            table.className = 'w-full text-sm text-left';
+            
+            if (!sqlJsResult.columns || sqlJsResult.columns.length === 0) {
+                const p = document.createElement('p');
+                p.className = "p-4 text-gray-400";
+                p.textContent = (sqlJsResult.values && sqlJsResult.values.length > 0) ? "Dati presenti ma senza nomi di colonna." : "Nessun record da visualizzare per questo risultato.";
+                return p;
+            }
+
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            sqlJsResult.columns.forEach(headerText => {
+                const th = document.createElement('th');
+                th.className = 'px-4 py-2 sticky top-0 z-10 bg-gray-700 text-white';
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+
+            const tbody = table.createTBody();
+            if (sqlJsResult.values.length === 0) {
+                const tr = tbody.insertRow();
+                const td = tr.insertCell();
+                td.colSpan = sqlJsResult.columns.length;
+                td.className = 'px-4 py-2 text-center text-gray-400';
+                td.textContent = 'Nessun record trovato.';
+            } else {
+                sqlJsResult.values.forEach((rowArray, rowIndex) => {
+                    const tr = tbody.insertRow();
+                    tr.className = rowIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-900'; 
+                    rowArray.forEach(cellData => {
+                        const td = tr.insertCell();
+                        td.className = 'px-4 py-2 border-t border-gray-700';
+                        td.textContent = cellData === null ? 'NULL' : String(cellData);
+                    });
+                });
+            }
+            return table;
+        }
+
+        function showTable(tableName) {
+            if (!db) return;
+            try {
+                const results = db.exec(`SELECT * FROM ${tableName} LIMIT 50;`); // Limit rows for preview
+                const previewContainer = document.getElementById('table-preview');
+                previewContainer.innerHTML = ''; 
+                document.getElementById('table-preview-title').textContent = `Anteprima Tabella: ${tableName} (prime 50 righe)`;
+
+                if (results.length > 0 && results[0].columns && results[0].values) {
+                    previewContainer.appendChild(createTableFromSqlJsResult(results[0]));
+                } else if (results.length > 0 && results[0].values.length === 0) {
+                     previewContainer.appendChild(createTableFromSqlJsResult(results[0])); // Show empty table with headers
+                }
+                else {
+                    previewContainer.innerHTML = `<p class="text-gray-400 p-4">La tabella '${tableName}' è vuota o non trovata.</p>`;
+                }
+            } catch (e) {
+                console.error(`Errore nel visualizzare la tabella ${tableName}:`, e);
+                document.getElementById('table-preview').innerHTML = `<p class="text-red-400 p-4">Errore nel caricare la tabella: ${e.message}</p>`;
+                document.getElementById('table-preview-title').textContent = `Errore Tabella: ${tableName}`;
+            }
+        }
+
+        function clearEditor() {
+            document.getElementById('sql-editor').value = '';
+            // Results are not cleared, they reflect the last executed query
+        }
+
+        function showHint() {
+            if (gameState.currentChallengeIndex >= challenges.length) return; // No challenge loaded
+            const challenge = challenges[gameState.currentChallengeIndex];
+            Swal.fire({ icon: 'info', title: 'Suggerimento per la Sfida', text: challenge.hint, confirmButtonColor: '#3b82f6', customClass: {popup: 'glass-effect', htmlContainer: 'text-white'} });
+        }
+
+        function nextChallenge() {
+            gameState.currentChallengeIndex++;
+             updateChallengeProgress(); // Update progress *before* checking if game is complete
+            if (gameState.currentChallengeIndex < challenges.length) {
+                loadChallenge();
+                document.getElementById('sql-editor').value = ''; // Clear editor for next challenge
+                document.getElementById('query-results').innerHTML = '<p class="text-gray-400 p-4">Testa o sottoponi una query per vedere i risultati qui.</p>'; // Clear previous results
+            } else {
+                completeGame();
+            }
+        }
+        
+        function showCheatSheet() {
+            Swal.fire({
+                title: '📚 SQL Cheat Sheet',
+                html: `
+                    <div class="text-left text-sm space-y-2 p-4 bg-gray-800 rounded-lg max-h-96 overflow-y-auto">
+                        <p><strong>SELECT</strong> col1, col2 FROM tabella;</p>
+                        <p><strong>SELECT *</strong> FROM tabella;</p>
+                        <p><strong>WHERE</strong> condizione;</p>
+                        <p><em>Operatori:</em> =, <, >, <=, >=, != (<>), LIKE, IN, BETWEEN, IS NULL</p>
+                        <p><em>Testo:</em> WHERE nome = 'Valore'; (usa apici singoli)</p>
+                        <p><em>Numeri:</em> WHERE prezzo > 100;</p>
+                        <p><strong>AND / OR / NOT:</strong> WHERE cond1 AND cond2;</p>
+                        <p><strong>ORDER BY</strong> col1 ASC/DESC;</p>
+                        <p><strong>INNER JOIN</strong> tab2 ON tab1.id = tab2.id;</p>
+                        <p><strong>LEFT JOIN</strong> tab2 ON tab1.id = tab2.id;</p>
+                        <p><strong>RIGHT JOIN</strong> tab2 ON tab1.id = tab2.id;</p>
+                        <p><strong>FULL OUTER JOIN</strong> tab2 ON tab1.id = tab2.id;</p>
+                        <p><strong>COUNT</strong>(col / *), <strong>SUM</strong>(col), <strong>AVG</strong>(col), <strong>MAX</strong>(col), <strong>MIN</strong>(col)</p>
+                        <p><strong>GROUP BY</strong> col1, col2;</p>
+                        <p><strong>HAVING</strong> condizione_aggregata; (dopo GROUP BY)</p>
+                        <p><strong>LIMIT</strong> numero_righe; (Non standard SQL, ma comune)</p>
+                        <p><strong>OFFSET</strong> numero_righe; (Con LIMIT, non standard SQL, ma comune)</p>
+                        <p><strong>DISTINCT</strong> col1; (per valori unici)</p>
+                        <p><strong>AS</strong> alias_colonna_o_tabella;</p>
+                        <p><strong>INSERT INTO</strong> tabella (col1, col2) VALUES (val1, val2);</p>
+                        <p><strong>UPDATE</strong> tabella SET col1 = val1 WHERE condizione;</p>
+                        <p><strong>DELETE FROM</strong> tabella WHERE condizione;</p>
+                    </div>
+                `,
+                confirmButtonText: 'Capito!',
+                confirmButtonColor: '#3b82f6',
+                width: 'auto', 
+                customClass: { popup: 'glass-effect', htmlContainer: 'text-white' }
+            });
+        }
+
+        function completeGame() {
+            updateChallengeProgress(); // Ensure progress bar shows 100%
+            Swal.fire({
+                iconHtml: '<span class="text-6xl">🎉</span>',
+                title: `Complimenti, Hai Terminato!`,
+                html: `
+                    <div class="text-center space-y-4 text-white">
+                        <h3 class="text-2xl font-bold">Congratulazioni!</h3>
+                        <p class="text-lg">
+                            Hai completato con successo tutte le sfide de "Il Bibliotecario Digitale"!
+                        </p>
+                        <p>
+                            Continua a esercitarti per affinare le tue abilità SQL.
+                        </p>
+                    </div>
+                `,
+                confirmButtonText: 'Ricomincia',
+                confirmButtonColor: '#10b981',
+                customClass: { popup: 'glass-effect' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initGame(); 
+            
+            document.addEventListener('keydown', function(e) {
+                if (!document.getElementById('lab-section').classList.contains('hidden')) { // Only in lab
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        submitQuery(); // Ctrl+Enter now submits
+                    } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        clearEditor();
+                    }
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
