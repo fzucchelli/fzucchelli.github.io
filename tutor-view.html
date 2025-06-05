@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestore Logistico Digitale - Vista Tutor (Soluzioni)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f9ff; /* Light blue background */
+            color: #1e293b; /* Dark slate text */
+        }
+        .container {
+            max-width: 1000px;
+        }
+        .question-block, .challenge-block {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .question-text, .challenge-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0072ff; /* Theme blue */
+            margin-bottom: 0.75rem;
+        }
+        .answer-list li {
+            padding: 0.25rem 0;
+        }
+        .correct-answer {
+            color: #10b981; /* Green */
+            font-weight: bold;
+        }
+        .explanation, .solution-code, .hint-text {
+            background-color: #f8fafc; /* Very light gray */
+            border-left: 4px solid #00c6ff; /* Lighter theme blue */
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap; /* Preserve formatting for code */
+            word-wrap: break-word;
+        }
+        .hint-text {
+            border-left-color: #facc15; /* Yellow for hints */
+        }
+        .solution-code {
+            color: #0d9488; /* Teal for SQL code */
+        }
+        h1, h2, h3 {
+            color: #005bb5; /* Darker theme blue for headers */
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .badge-green {
+            color: #fff;
+            background-color: #10b981;
+        }
+        .badge-blue {
+             color: #fff;
+            background-color: #3b82f6;
+        }
+         .badge-yellow {
+            color: #1f2937;
+            background-color: #facc15;
+        }
+    </style>
+</head>
+<body class="p-5">
+    <div class="container mx-auto">
+        <header class="text-center mb-8">
+            <i class="fas fa-user-shield text-5xl text-blue-600 mb-3"></i>
+            <h1 class="text-4xl font-bold">Gestore Logistico Digitale - Vista Tutor</h1>
+            <p class="text-lg text-gray-600">Soluzioni e Spiegazioni per Quiz e Sfide</p>
+        </header>
+
+        <section id="quiz-solutions">
+            <h2 class="text-3xl font-semibold mb-6 border-b-2 pb-2 border-blue-300">
+                <i class="fas fa-question-circle mr-2 text-blue-500"></i>Soluzioni Quiz (Teoria e Normalizzazione)
+            </h2>
+            <!-- Quiz questions will be injected here by script -->
+        </section>
+
+        <section id="syntax-builder-solutions" class="mt-12">
+            <h2 class="text-3xl font-semibold mb-6 border-b-2 pb-2 border-blue-300">
+                <i class="fas fa-drafting-compass mr-2 text-blue-500"></i>Soluzioni Costruttore Query Base
+            </h2>
+            <!-- Syntax builder challenges will be injected here -->
+        </section>
+
+        <section id="lab-solutions" class="mt-12">
+            <h2 class="text-3xl font-semibold mb-6 border-b-2 pb-2 border-blue-300">
+                <i class="fas fa-cogs mr-2 text-blue-500"></i>Soluzioni Sfide Laboratorio SQL
+            </h2>
+            <!-- Lab challenges will be injected here -->
+        </section>
+    </div>
+
+    <script>
+        const quizQuestions = [
+            // Original 20
+            { question: "Quale comando SQL è usato per recuperare dati?", answers: ["SELECT", "GET", "FETCH", "RETRIEVE"], correct: 0, explanation: "SELECT è il comando standard per interrogare un database." },
+            { question: "Cosa significa 'PK' in uno schema di database?", answers: ["Public Key", "Primary Key", "Package Key", "Private Key"], correct: 1, explanation: "PK sta per Primary Key (Chiave Primaria), che identifica univocamente ogni record." },
+            { question: "Quale clausola filtra i risultati di una SELECT?", answers: ["FILTER BY", "HAVING", "WHERE", "LIMIT"], correct: 2, explanation: "La clausola WHERE è usata per filtrare i record." },
+            { question: "Cos'è una 'Foreign Key' (FK)?", answers: ["Una chiave crittografica", "Una chiave che collega due tabelle", "Una chiave temporanea", "Una chiave per ordinare i dati"], correct: 1, explanation: "Una Foreign Key (Chiave Esterna) crea una relazione tra tabelle." },
+            { question: "Quale JOIN restituisce solo righe con corrispondenze in entrambe le tabelle?", answers: ["LEFT JOIN", "RIGHT JOIN", "FULL JOIN", "INNER JOIN"], correct: 3, explanation: "INNER JOIN seleziona record che hanno valori corrispondenti in entrambe le tabelle." },
+            { question: "Cosa si intende per Prima Forma Normale (1NF)?", answers: ["Nessun gruppo ripetuto, valori atomici", "Nessuna dipendenza parziale", "Nessuna dipendenza transitiva", "Tutte le chiavi sono definite"], correct: 0, explanation: "1NF richiede che ogni cella contenga un singolo valore (atomicità) e non ci siano gruppi ripetuti di colonne." },
+            { question: "Una tabella è in Seconda Forma Normale (2NF) se:", answers: ["È in 1NF e tutti gli attributi non chiave dipendono pienamente dalla chiave primaria", "Non ha dipendenze transitive", "Ha solo una chiave primaria", "Usa solo JOIN"], correct: 0, explanation: "2NF richiede che la tabella sia in 1NF e che tutti gli attributi non facenti parte della chiave primaria dipendano funzionalmente dall'intera chiave primaria (nessuna dipendenza parziale)." },
+            { question: "Quando una tabella è in Terza Forma Normale (3NF)?", answers: ["Quando è molto grande", "Quando è in 2NF e non ha dipendenze transitive", "Quando non usa chiavi esterne", "Quando i dati sono crittografati"], correct: 1, explanation: "3NF richiede che la tabella sia in 2NF e che non ci siano dipendenze transitive (attributi non chiave che dipendono da altri attributi non chiave)." },
+            { question: "Cosa descrive una 'dipendenza funzionale' (A -> B)?", answers: ["A causa B", "Il valore di A determina univocamente il valore di B", "A e B sono sempre uguali", "B può avere molti valori per A"], correct: 1, explanation: "A -> B significa che per ogni valore di A, c'è un solo valore possibile di B." },
+            { question: "Un'anomalia di aggiornamento in una tabella non normalizzata si verifica quando:", answers: ["L'aggiornamento è troppo lento", "Bisogna aggiornare la stessa informazione in più righe", "Non si può aggiornare una chiave primaria", "L'SQL non funziona"], correct: 1, explanation: "Nelle tabelle non normalizzate, la ridondanza può costringere ad aggiornare la stessa informazione in più posti, rischiando inconsistenze." },
+            { question: "La tabella `Ordini(IDOrdine, DataOrdine, IDCliente, NomeCliente, IndirizzoCliente)` che problemi di normalizzazione presenta?", answers: ["Nessuno, è perfetta", "Dipendenza parziale", "Dipendenza transitiva (NomeCliente e IndirizzoCliente dipendono da IDCliente, non da IDOrdine)", "Non è in 1NF"], correct: 2, explanation: "NomeCliente e IndirizzoCliente dipendono da IDCliente, che è un attributo non chiave. Se IDOrdine è la PK, allora IDOrdine -> IDCliente -> NomeCliente è una dipendenza transitiva." },
+            { question: "Come si ordinano i risultati in ordine decrescente per una colonna 'pesoKg'?", answers: ["ORDER BY pesoKg DOWN", "SORT BY pesoKg DESC", "ORDER BY pesoKg DESCENDING", "ORDER BY pesoKg DESC"], correct: 3, explanation: "ORDER BY nomeColonna DESC ordina i risultati in modo decrescente." },
+            { question: "Quale funzione di aggregazione calcola la media?", answers: ["AVERAGE()", "MEAN()", "AVG()", "MEDIAN()"], correct: 2, explanation: "AVG(nomeColonna) calcola il valore medio di una colonna numerica." },
+            { question: "Per contare il numero di pacchi, quale query useresti?", answers: ["TOTAL(Pacchi)", "COUNT(*) FROM Pacchi", "NUMBER OF Pacchi", "SUM(Pacchi)"], correct: 1, explanation: "COUNT(*) conta tutte le righe in una tabella. COUNT(nomeColonna) conta le righe non-NULL per quella colonna." },
+            { question: "La clausola `GROUP BY` è spesso usata con:", answers: ["ORDER BY", "Funzioni di aggregazione", "WHERE", "Subquery"], correct: 1, explanation: "GROUP BY raggruppa righe con gli stessi valori in colonne specificate, per poter applicare funzioni di aggregazione a ciascun gruppo." },
+            { question: "Qual è lo scopo della clausola `HAVING`?", answers: ["Filtrare righe prima del raggruppamento", "Filtrare gruppi dopo il raggruppamento", "Un'alternativa a WHERE per le stringhe", "Definire alias"], correct: 1, explanation: "HAVING filtra i risultati dei gruppi creati da GROUP BY, basandosi su condizioni applicate alle funzioni di aggregazione." },
+            { question: "Come si inseriscono nuovi dati nella tabella 'Clienti'?", answers: ["ADD INTO Clienti VALUES(...)", "CREATE Clienti VALUES(...)", "INSERT INTO Clienti VALUES(...)", "NEW Clienti VALUES(...)"], correct: 2, explanation: "INSERT INTO è il comando standard per aggiungere nuove righe." },
+            { question: "Per modificare l'indirizzo di un cliente esistente, si usa:", answers: ["MODIFY Clienti SET indirizzo...", "CHANGE Clienti SET indirizzo...", "ALTER Clienti SET indirizzo...", "UPDATE Clienti SET indirizzo..."], correct: 3, explanation: "UPDATE è usato per modificare record esistenti." },
+            { question: "Come si trova un pacco con `codiceTracciamento` che inizia per 'TRK123'?", answers: ["WHERE codiceTracciamento = 'TRK123%'", "WHERE codiceTracciamento STARTS WITH 'TRK123'", "WHERE codiceTracciamento LIKE 'TRK123%'", "WHERE codiceTracciamento CONTAINS 'TRK123'"], correct: 2, explanation: "L'operatore LIKE con il carattere jolly '%' permette la ricerca di pattern." },
+            { question: "Se vuoi vedere solo le città uniche delle Sedi, quale query usi?", answers: ["SELECT UNIQUE cittaSede FROM Sedi", "SELECT DISTINCT cittaSede FROM Sedi", "SELECT DIFFERENT cittaSede FROM Sedi", "SELECT VARIOUS cittaSede FROM Sedi"], correct: 1, explanation: "SELECT DISTINCT restituisce solo valori unici per la colonna specificata." },
+            
+            // New 10 questions
+            { question: "Quale tipo di dato SQL è più appropriato per memorizzare un prezzo come 19.99?", answers: ["INTEGER", "TEXT", "BOOLEAN", "DECIMAL(10,2)"], correct: 3, explanation: "DECIMAL o NUMERIC (o REAL/FLOAT in alcuni DB) sono usati per numeri con cifre decimali, essenziali per i valori monetari. INTEGER è solo per numeri interi." },
+            { question: "Come si verifica se un valore nella colonna `noteOpzionali` è mancante (NULL)?", answers: ["WHERE noteOpzionali = ''", "WHERE noteOpzionali = NULL", "WHERE noteOpzionali IS NULL", "WHERE noteOpzionali IS EMPTY"], correct: 2, explanation: "Per verificare la presenza di NULL, si usa IS NULL (o IS NOT NULL). Il confronto diretto con NULL (es. = NULL) non funziona come ci si aspetterebbe." },
+            { question: "Quale vincolo (constraint) assicura che tutti i valori in una colonna `codiceFiscale` siano unici?", answers: ["PRIMARY KEY", "UNIQUE", "CHECK (codiceFiscale IS DISTINCT)", "NOT NULL"], correct: 1, explanation: "Il vincolo UNIQUE garantisce che ogni valore nella colonna sia diverso dagli altri, consentendo però valori NULL (a meno che non sia specificato anche NOT NULL)." },
+            { question: "Quale comando SQL si usa per aggiungere una nuova colonna a una tabella esistente?", answers: ["MODIFY TABLE", "UPDATE TABLE", "ALTER TABLE", "CHANGE TABLE"], correct: 2, explanation: "ALTER TABLE è il comando DDL (Data Definition Language) utilizzato per modificare la struttura di una tabella esistente." },
+            { question: "Se esegui `DELETE FROM Pacchi;` (senza una clausola WHERE), cosa succede?", answers: ["Viene eliminata la tabella Pacchi.", "Vengono eliminate tutte le righe dalla tabella Pacchi.", "Viene generato un errore perché manca WHERE.", "Nulla, è un comando non valido."], correct: 1, explanation: "DELETE FROM nomeTabella senza WHERE rimuove tutte le righe, ma la struttura della tabella rimane. DROP TABLE elimina la tabella intera." },
+            { question: "Qual è la differenza principale tra `UNION` e `UNION ALL`?", answers: ["UNION è più veloce.", "UNION ALL rimuove i duplicati, UNION no.", "UNION rimuove i duplicati, UNION ALL no.", "Non c'è differenza funzionale."], correct: 2, explanation: "UNION combina i risultati di due SELECT e rimuove i duplicati. UNION ALL include tutte le righe, comprese le duplicate, ed è generalmente più veloce." },
+            { question: "In quale scenario è utile una subquery con l'operatore `IN`?", answers: ["Per calcolare una media.", "Per verificare se un valore esiste in un set di risultati di un'altra query.", "Per unire due tabelle.", "Per ordinare i risultati."], correct: 1, explanation: "WHERE colonna IN (SELECT altra_colonna FROM ...) permette di filtrare le righe basandosi sui valori restituiti dalla subquery." },
+            { question: "A cosa serve la parola chiave `AS` in una query SQL?", answers: ["Per creare una nuova tabella.", "Per definire un tipo di dato.", "Per assegnare un nome temporaneo (alias) a una colonna o tabella.", "Per eseguire un'asserzione."], correct: 2, explanation: "AS è usato per dare un alias a colonne o tabelle, rendendo le query più leggibili o i nomi delle colonne nel risultato più significativi." },
+            { question: "Cosa fa il comando `COMMIT` in una transazione SQL?", answers: ["Annulla le modifiche della transazione.", "Salva permanentemente le modifiche della transazione.", "Inizia una nuova transazione.", "Controlla la sintassi della transazione."], correct: 1, explanation: "COMMIT finalizza una transazione, rendendo permanenti tutte le modifiche al database eseguite dall'inizio della transazione." },
+            { question: "Qual è lo scopo principale di creare un indice su una colonna?", answers: ["Garantire l'unicità dei dati.", "Migliorare la velocità delle query di ricerca (SELECT).", "Ridurre lo spazio della tabella.", "Facilitare i backup."], correct: 1, explanation: "Gli indici accelerano il recupero dei dati. Sebbene alcuni indici (es. per PK) garantiscano l'unicità, lo scopo primario è la performance delle SELECT." }
+        ];
+
+        const syntaxChallenges = [
+            { 
+                description: "Seleziona tutte le colonne e tutte le righe dalla tabella 'Sedi'.", 
+                solutionTokens: ["SELECT", "*", "FROM", "Sedi"],
+            },
+            { 
+                description: "Mostra solo le colonne 'nomeSede' e 'cittaSede' dalla tabella 'Sedi'.",
+                solutionTokens: ["SELECT", "nomeSede", ",", "cittaSede", "FROM", "Sedi"],
+            },
+            {
+                description: "Seleziona tutti i pacchi dalla tabella 'Pacchi' dove 'cittaDestinatario' è 'Roma'.",
+                solutionTokens: ["SELECT", "*", "FROM", "Pacchi", "WHERE", "cittaDestinatario", "=", "'Roma'"],
+            }
+        ];
+
+        const labChallenges = [
+            // Basic SELECTs
+            { phase: 1, title: "Elenco Sedi", description: "Mostra tutti i dati di tutte le sedi logistiche.", hint: "Usa `SELECT * FROM nome_tabella;`", solution: "SELECT * FROM Sedi;" },
+            { phase: 1, title: "Anagrafica Clienti", description: "Mostra nome, cognome e tipo di tutti i clienti.", hint: "Seleziona le colonne `nomeCliente`, `cognomeCliente`, `tipoCliente` dalla tabella `Clienti`.", solution: "SELECT nomeCliente, cognomeCliente, tipoCliente FROM Clienti;" },
+            { phase: 1, title: "Inventario Pacchi Semplice", description: "Mostra il codice di tracciamento e la descrizione di tutti i pacchi.", hint: "Seleziona `codiceTracciamento` e `descrizione` da `Pacchi`.", solution: "SELECT codiceTracciamento, descrizione FROM Pacchi;" },
+            // Filtering (WHERE)
+            { phase: 1, title: "Sedi Milanesi", description: "Trova tutte le sedi situate a 'Milano'.", hint: "Usa `WHERE cittaSede = 'Milano'`.", solution: "SELECT * FROM Sedi WHERE cittaSede = 'Milano';" },
+            { phase: 1, title: "Pacchi Pesanti", description: "Elenca i pacchi con un peso superiore a 10 Kg.", hint: "Filtra `Pacchi` per `pesoKg > 10`.", solution: "SELECT * FROM Pacchi WHERE pesoKg > 10;" },
+            { phase: 1, title: "Pacchi in Transito", description: "Trova tutte le spedizioni attualmente 'In transito'. Considera l'ultimo stato per ogni pacco.", 
+              hint: "Identifica l'ultimo evento per ogni pacco e poi filtra per stato. Potrebbe richiedere una subquery o un approccio con MAX(dataOraEvento) e GROUP BY idPacco, per poi unire di nuovo per ottenere lo stato.",
+              solution: "SELECT s.* FROM Spedizioni s INNER JOIN (SELECT idPacco, MAX(dataOraEvento) AS MaxData FROM Spedizioni GROUP BY idPacco) sm ON s.idPacco = sm.idPacco AND s.dataOraEvento = sm.MaxData WHERE s.statoSpedizione = 'In transito';"
+            },
+            // Sorting (ORDER BY)
+            { phase: 2, title: "Pacchi per Peso", description: "Mostra codice tracciamento, descrizione e peso dei pacchi, ordinati per peso in ordine decrescente.", hint: "Usa `ORDER BY pesoKg DESC`.", solution: "SELECT codiceTracciamento, descrizione, pesoKg FROM Pacchi ORDER BY pesoKg DESC;" },
+            // Aggregations & GROUP BY
+            { phase: 2, title: "Conteggio Pacchi per Stato", description: "Conta quanti pacchi ci sono per ogni `statoSpedizione` nell'ultimo evento di spedizione registrato per ciascun pacco.", 
+              hint: "Prima trova l'ultimo stato di ogni pacco (come nella sfida 'Pacchi in Transito'), poi raggruppa per `statoSpedizione` e conta.", 
+              solution: "SELECT s.statoSpedizione, COUNT(s.idPacco) AS numeroPacchi FROM Spedizioni s INNER JOIN (SELECT idPacco, MAX(dataOraEvento) AS MaxData FROM Spedizioni GROUP BY idPacco) sm ON s.idPacco = sm.idPacco AND s.dataOraEvento = sm.MaxData GROUP BY s.statoSpedizione;" 
+            },
+            { phase: 2, title: "Capacità Totale Sedi per Città", description: "Calcola la capacità massima totale di pacchi per ogni città che ha almeno una sede.", hint: "Usa `SUM(capacitaMaxPacchi)` e `GROUP BY cittaSede`.", solution: "SELECT cittaSede, SUM(capacitaMaxPacchi) AS capacitaTotale FROM Sedi GROUP BY cittaSede;" },
+            // JOINs
+            { phase: 3, title: "Pacchi e Mittenti", description: "Mostra il codice di tracciamento del pacco e il nome e cognome del cliente mittente.", hint: "Unisci `Pacchi` (p) e `Clienti` (c) su `p.idClienteMittente = c.idCliente`.", solution: "SELECT p.codiceTracciamento, c.nomeCliente, c.cognomeCliente FROM Pacchi p JOIN Clienti c ON p.idClienteMittente = c.idCliente;" },
+            { phase: 3, title: "Pacchi e Loro Sede Corrente", description: "Mostra il codice tracciamento del pacco e il nome della sua sede corrente (basato sull'ultimo evento di spedizione).", 
+              hint: "Trova l'ultimo evento per ogni pacco, poi unisci con `Sedi` per ottenere `nomeSede`.", 
+              solution: "SELECT p.codiceTracciamento, sed.nomeSede AS sedeCorrente FROM Pacchi p JOIN Spedizioni s ON p.idPacco = s.idPacco JOIN (SELECT idPacco, MAX(dataOraEvento) AS MaxData FROM Spedizioni GROUP BY idPacco) sm ON s.idPacco = sm.idPacco AND s.dataOraEvento = sm.MaxData JOIN Sedi sed ON s.idSedeCorrente = sed.idSede;"
+            },
+            // Advanced
+            { phase: 4, title: "Clienti con Più di Un Pacco Spedito", description: "Trova i clienti (ID e nome) che hanno spedito più di un pacco.", hint: "Raggruppa `Pacchi` per `idClienteMittente`, conta i pacchi e usa `HAVING COUNT(*) > 1`. Poi unisci con `Clienti`.", solution: "SELECT c.idCliente, c.nomeCliente, c.cognomeCliente, COUNT(p.idPacco) AS numeroPacchiSpediti FROM Clienti c JOIN Pacchi p ON c.idCliente = p.idClienteMittente GROUP BY c.idCliente, c.nomeCliente, c.cognomeCliente HAVING COUNT(p.idPacco) > 1;" },
+            { phase: 4, title: "Pacchi Più Pesanti della Media", description: "Elenca i pacchi (codice tracciamento e peso) che pesano più del peso medio di tutti i pacchi.", hint: "Usa una subquery per calcolare `AVG(pesoKg)` da `Pacchi`.", solution: "SELECT codiceTracciamento, pesoKg FROM Pacchi WHERE pesoKg > (SELECT AVG(pesoKg) FROM Pacchi);" },
+            { phase: 4, title: "Ultimo Stato per Pacco TRK001", description: "Trova l'ultimo stato registrato per il pacco con `codiceTracciamento` 'TRK001'. Mostra stato e data/ora evento.", 
+              hint: "Filtra `Spedizioni` per `idPacco` corrispondente a 'TRK001', poi ordina per `dataOraEvento DESC` e prendi il primo (`LIMIT 1`).", 
+              solution: "SELECT s.statoSpedizione, s.dataOraEvento FROM Spedizioni s JOIN Pacchi p ON s.idPacco = p.idPacco WHERE p.codiceTracciamento = 'TRK001' ORDER BY s.dataOraEvento DESC LIMIT 1;"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizSolutionsContainer = document.getElementById('quiz-solutions');
+            quizQuestions.forEach((q, index) => {
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                
+                let answersHtml = '<ul class="answer-list list-disc list-inside pl-4">';
+                q.answers.forEach((ans, i) => {
+                    answersHtml += `<li class="${i === q.correct ? 'correct-answer' : ''}">${ans}</li>`;
+                });
+                answersHtml += '</ul>';
+
+                block.innerHTML = `
+                    <p class="question-text">${index + 1}. ${q.question}</p>
+                    ${answersHtml}
+                    <div class="explanation"><strong>Spiegazione:</strong> ${q.explanation}</div>
+                `;
+                quizSolutionsContainer.appendChild(block);
+            });
+
+            const syntaxSolutionsContainer = document.getElementById('syntax-builder-solutions');
+            syntaxChallenges.forEach((sc, index) => {
+                const block = document.createElement('div');
+                block.className = 'challenge-block';
+                block.innerHTML = `
+                    <p class="challenge-title">${index + 1}. ${sc.description}</p>
+                    <div class="solution-code"><strong>Soluzione:</strong> ${sc.solutionTokens.join(' ') + ';'}</div>
+                `;
+                syntaxSolutionsContainer.appendChild(block);
+            });
+
+
+            const labSolutionsContainer = document.getElementById('lab-solutions');
+            labChallenges.forEach((lc, index) => {
+                const block = document.createElement('div');
+                block.className = 'challenge-block';
+                block.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <p class="challenge-title">${index + 1}. ${lc.title}</p>
+                        <span class="badge badge-blue">Fase ${lc.phase}</span>
+                    </div>
+                    <p class="text-gray-700 mb-2">${lc.description}</p>
+                    <div class="hint-text"><strong><i class="fas fa-lightbulb mr-1"></i>Suggerimento:</strong> ${lc.hint}</div>
+                    <div class="solution-code"><strong><i class="fas fa-code mr-1"></i>Soluzione Query:</strong><br>${lc.solution}</div>
+                `;
+                labSolutionsContainer.appendChild(block);
+            });
+        });
+    </script>
+</body>
+</html>
